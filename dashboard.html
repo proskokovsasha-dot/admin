@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - TimeCafe</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Боковая панель -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar">
+                    <img src="https://ui-avatars.com/api/?name=User&background=4e54c8&color=fff" alt="Avatar" id="userAvatar">
+                    <span class="online-status"></span>
+                </div>
+                <h2 id="userName">Имя пользователя</h2>
+                <p id="userPosition">Должность</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Главная</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="shifts">
+                    <i class="fas fa-history"></i>
+                    <span>История смен</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="vacation">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <span>Отпуск и больничные</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="profile">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Профиль</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="shift-status">
+                    <p id="currentShiftStatus">Смена не начата</p>
+                    <div class="status-indicator" id="statusIndicator"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="main-content">
+            <!-- Приветствие -->
+            <div class="welcome-banner" id="welcomeBanner">
+                <div class="welcome-content">
+                    <h1 id="welcomeMessage">Добро пожаловать!</h1>
+                    <p id="welcomeSubMessage">Рады видеть вас снова</p>
+                </div>
+                <div class="welcome-actions">
+                    <!-- Кнопка "Начать смену" в баннере, будет скрываться/показываться JS -->
+                    <button class="btn-primary" id="startShiftBtnBanner">
+                        <i class="fas fa-play-circle"></i>
+                        Начать смену
+                    </button>
+                </div>
+            </div>
+
+            <!-- Контент вкладок -->
+            <div class="tab-content">
+                <!-- Вкладка Главная -->
+                <div class="tab-pane active" id="dashboard-tab">
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Текущая смена</h3>
+                                <p class="stat-value" id="currentShiftTime">00:00:00</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-ruble-sign"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Заработок</h3>
+                                <p class="stat-value" id="currentEarnings">0 руб.</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Смен в этом месяце</h3>
+                                <p class="stat-value" id="shiftsThisMonth">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions-container">
+                        <!-- Основная кнопка "Начать смену" -->
+                        <button class="action-btn large" id="startShiftBtn">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Начать смену</span>
+                        </button>
+
+                        <!-- Кнопка "Подтвердить фото" - изначально скрыта -->
+                        <button class="action-btn large secondary" id="photoShiftBtn" style="display: none;">
+                            <i class="fas fa-camera"></i>
+                            <span>Подтвердить фото</span>
+                        </button>
+
+                        <!-- Кнопка "Завершить смену" - изначально скрыта -->
+                        <button class="action-btn large danger" id="endShiftBtn" style="display: none;">
+                            <i class="fas fa-stop-circle"></i>
+                            <span>Завершить смену</span>
+                        </button>
+                    </div>
+
+                    <div class="quick-stats">
+                        <h2>Быстрая статистика</h2>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <label>Всего часов:</label>
+                                <span id="totalHours">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <label>Общий заработок:</label>
+                                <span id="totalEarnings">0 руб.</span>
+                            </div>
+                            <div class="stat-item">
+                                <label>В этом месяце:</label>
+                                <span id="monthEarnings">0 руб.</span>
+                            </div>
+                            <div class="stat-item">
+                                <label>Средняя смена:</label>
+                                <span id="avgShift">0 часов</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка История смен -->
+                <div class="tab-pane" id="shifts-tab">
+                    <div class="tab-header">
+                        <h2>История смен</h2>
+                        <div class="filter-controls">
+                            <select id="shiftsFilter">
+                                <option value="all">Все смены</option>
+                                <option value="month">Этот месяц</option>
+                                <option value="week">Эта неделя</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="shifts-list" id="shiftsList">
+                        <!-- История смен будет загружена через JS -->
+                    </div>
+                </div>
+
+                <!-- Вкладка Отпуск и больничные -->
+                <div class="tab-pane" id="vacation-tab">
+                    <div class="tab-header">
+                        <h2>Отпуск и больничные</h2>
+                        <button class="btn-primary" id="requestTimeOffBtn">
+                            <i class="fas fa-plus"></i>
+                            Подать заявку
+                        </button>
+                    </div>
+
+                    <div class="timeoff-stats">
+                        <div class="timeoff-stat">
+                            <h3>Доступно отпуска</h3>
+                            <p class="days-available">14 дней</p>
+                        </div>
+                        <div class="timeoff-stat">
+                            <h3>Использовано</h3>
+                            <p class="days-used">5 дней</p>
+                        </div>
+                        <div class="timeoff-stat">
+                            <h3>Больничные</h3>
+                            <p class="sick-days">2 дня</p>
+                        </div>
+                    </div>
+
+                    <div class="requests-list">
+                        <h3>Последние заявки</h3>
+                        <div class="request-item">
+                            <div class="request-info">
+                                <h4>Отпуск</h4>
+                                <p>10.08.2023 - 20.08.2023</p>
+                            </div>
+                            <div class="request-status approved">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Одобрено</span>
+                            </div>
+                        </div>
+                        <div class="request-item">
+                            <div class="request-info">
+                                <h4>Больничный</h4>
+                                <p>05.07.2023 - 07.07.2023</p>
+                            </div>
+                            <div class="request-status pending">
+                                <i class="fas fa-clock"></i>
+                                <span>На рассмотрении</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вкладка Профиль -->
+                <div class="tab-pane" id="profile-tab">
+                    <div class="tab-header">
+                        <h2>Профиль сотрудника</h2>
+                    </div>
+
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <img src="https://ui-avatars.com/api/?name=User&background=4e54c8&color=fff" alt="Avatar" id="profileAvatar">
+                                <button class="avatar-edit">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                            </div>
+                            <div class="profile-info">
+                                <h2 id="profileName">Имя Фамилия</h2>
+                                <p id="profilePosition">Должность</p>
+                                <p id="profileEmail">user@example.com</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <label><i class="fas fa-phone"></i> Телефон:</label>
+                                <span id="profilePhone">+7 (999) 123-45-67</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fas fa-calendar-alt"></i> Дата регистрации:</label>
+                                <span id="profileJoinDate">01.01.2023</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fas fa-clock"></i> Всего отработано:</label>
+                                <span id="profileTotalHours">120 часов</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-actions">
+                            <button class="btn-secondary">
+                                <i class="fas fa-edit"></i>
+                                Редактировать профиль
+                            </button>
+                            <button class="btn-secondary">
+                                <i class="fas fa-lock"></i>
+                                Сменить пароль
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для фото подтверждения -->
+    <div class="modal" id="photoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Подтверждение начала смены</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Сделайте фото для подтверждения начала смены</p>
+                <div class="camera-container">
+                    <video id="cameraVideo" autoplay playsinline></video>
+                    <canvas id="photoCanvas" style="display: none;"></canvas>
+                </div>
+                <div class="camera-controls">
+                    <button id="captureBtn" class="btn-primary">
+                        <i class="fas fa-camera"></i>
+                        Сделать фото
+                    </button>
+                    <button id="retakeBtn" class="btn-secondary" style="display: none;">
+                        <i class="fas fa-redo"></i>
+                        Переснять
+                    </button>
+                    <button id="confirmPhotoBtn" class="btn-primary" style="display: none;">
+                        <i class="fas fa-check"></i>
+                        Подтвердить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для заявки на отпуск/больничный -->
+    <div class="modal" id="timeOffModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Подача заявки</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Тип заявки</label>
+                    <select id="requestType">
+                        <option value="vacation">Отпуск</option>
+                        <option value="sick">Больничный</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Дата начала</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="input-group">
+                        <label>Дата окончания</label>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Причина</label>
+                    <textarea id="requestReason" placeholder="Укажите причину"></textarea>
+                </div>
+                <button class="btn-primary" id="submitRequestBtn">Отправить заявку</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Сообщение</span>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - TimeCafe</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
+    <div class="auth-container">
+        <div class="logo">
+            <i class="fas fa-coffee"></i>
+            <h1>TimeCafe</h1>
+            <p>Создание аккаунта</p>
+        </div>
+
+        <div class="auth-card expanded">
+            <div class="auth-header">
+                <h2>Создать аккаунт</h2>
+                <p>Заполните информацию о себе</p>
+            </div>
+
+            <div class="auth-body">
+                <div class="form-row">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerName" placeholder="Ваше полное имя">
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-at"></i>
+                        <input type="text" id="registerUsername" placeholder="Имя пользователя">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" placeholder="Пароль">
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" placeholder="Подтвердите пароль">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-briefcase"></i>
+                    <select id="registerPosition">
+                        <option value="">Выберите должность</option>
+                        <option value="barista">Бариста</option>
+                        <option value="waiter">Официант</option>
+                        <option value="cook">Повар</option>
+                        <option value="manager">Менеджер</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="registerPhone" placeholder="Номер телефона">
+                </div>
+
+                <div class="agreement">
+                    <input type="checkbox" id="termsAgree">
+                    <label for="termsAgree">Я согласен с условиями использования и политикой конфиденциальности</label>
+                </div>
+
+                <button class="auth-btn" id="registerBtn">
+                    <span>Зарегистрироваться</span>
+                    <i class="fas fa-user-plus"></i>
+                </button>
+
+                <div class="auth-footer">
+                    <p>Уже есть аккаунт? <a href="index.html">Войти сейчас</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Сообщение</span>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

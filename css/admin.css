@@ -1,0 +1,212 @@
+/* Стили для административной панели */
+.admin-dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background: #1a1f3b;
+    color: #fff;
+}
+
+.admin-sidebar {
+    width: 280px;
+    background: #2a2f4c;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-header i {
+    font-size: 48px;
+    color: #6a11cb;
+    margin-bottom: 15px;
+}
+
+.admin-sidebar-header h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.admin-sidebar-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.admin-sidebar-nav {
+    flex: 1;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: all 0.3s;
+}
+
+.admin-nav-item i {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.admin-nav-item:hover {
+    background: rgba(106, 17, 203, 0.2);
+    color: white;
+}
+
+.admin-nav-item.active {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+}
+
+.admin-main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.admin-header {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.admin-header h1 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.admin-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+}
+
+.admin-tab-content {
+    margin-top: 20px;
+}
+
+.admin-tab-pane {
+    display: none;
+}
+
+.admin-tab-pane.active {
+    display: block;
+}
+
+.users-list-container {
+    background: #2a2f4c;
+    border-radius: 15px;
+    padding: 25px;
+    overflow-x: auto; /* Для адаптивности таблицы */
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.users-table th,
+.users-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.users-table th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.users-table td {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.users-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.users-table .action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.users-table .action-buttons button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.users-table .action-buttons .delete-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+}
+
+.users-table .action-buttons .delete-btn:hover {
+    background: #e03c4c;
+}
+
+.settings-card {
+    background: #2a2f4c;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.settings-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.settings-card p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.settings-card #currentHourlyRate {
+    font-weight: 700;
+    color: #2ed573;
+}
+
+/* Адаптивность для админ-панели */
+@media (max-width: 768px) {
+    .admin-dashboard-container {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .admin-main-content {
+        padding: 15px;
+    }
+
+    .users-table th,
+    .users-table td {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .users-table .action-buttons button {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+}

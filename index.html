@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeCafe - Учет рабочего времени</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
+    <div class="auth-container">
+        <div class="logo">
+            <i class="fas fa-coffee"></i>
+            <h1>TimeCafe</h1>
+            <p>Умный учет рабочего времени</p>
+        </div>
+
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Добро пожаловать!</h2>
+                <p>Войдите в свою учетную запись</p>
+            </div>
+
+            <div class="auth-body">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="loginUsername" placeholder="Ваше имя">
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="Пароль">
+                </div>
+
+                <button class="auth-btn" id="loginBtn">
+                    <span>Войти</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <div class="auth-footer">
+                    <p>Нет аккаунта? <a href="register.html">Создать сейчас</a></p>
+                    <!-- Добавлена ссылка на админ-панель, можно убрать, если не нужна на главной -->
+                    <p style="margin-top: 10px;">Вход для <a href="admin.html">Администратора</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-clock"></i>
+                <h3>Учет времени</h3>
+                <p>Автоматический подсчет рабочего времени</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-line"></i>
+                <h3>Статистика</h3>
+                <p>Детальная статистика и отчетность</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Мобильность</h3>
+                <p>Полная адаптация для телефона</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Сообщение</span>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
