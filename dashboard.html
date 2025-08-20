@@ -125,6 +125,12 @@
                             <i class="fas fa-stop-circle"></i>
                             <span>Завершить смену</span>
                         </button>
+
+                        <!-- Новая кнопка для отметки посещения вне смены -->
+                        <button class="action-btn large secondary" id="recordVisitBtn">
+                            <i class="fas fa-user-friends"></i>
+                            <span>Отметить посещение</span>
+                        </button>
                     </div>
 
                     <div class="quick-stats">
@@ -274,11 +280,11 @@
     <div class="modal" id="photoModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Подтверждение начала смены</h3>
+                <h3 id="photoModalTitle">Подтверждение начала смены</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="color: var(--secondary-text-color); margin-bottom: 15px;">Сделайте фото для подтверждения начала смены</p>
+                <p id="photoModalDescription" style="color: var(--secondary-text-color); margin-bottom: 15px;">Сделайте фото для подтверждения начала смены</p>
                 <div class="camera-container">
                     <video id="cameraVideo" autoplay playsinline></video>
                     <canvas id="photoCanvas"></canvas> <!-- Убрал style="display: none;" из HTML, будет управляться JS -->
