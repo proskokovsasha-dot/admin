@@ -19,9 +19,10 @@ function loadAdminDashboard() {
     initAdminNavigation();
     initAdminEventHandlers();
     
-    // Загружаем данные
+    // Загружаем данные для активной вкладки по умолчанию (Пользователи)
     loadUsersTable();
     updateHourlyRateDisplay();
+    loadVisitRecordsTable(); // Загружаем записи о посещениях при старте
 }
 
 // Инициализация обработчиков для логина администратора
@@ -81,6 +82,15 @@ function showAdminTab(tabName) {
         tab.classList.remove('active');
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
+
+    // Дополнительная загрузка данных при переключении вкладок
+    if (tabName === 'users') {
+        loadUsersTable();
+    } else if (tabName === 'visits') {
+        loadVisitRecordsTable();
+    } else if (tabName === 'settings') {
+        updateHourlyRateDisplay();
+    }
 }
 
 // Инициализация обработчиков событий админ-панели
@@ -143,9 +153,59 @@ function deleteUser(usernameToDelete) {
         delete users[usernameToDelete];
         saveUsers(users);
         removeUserShiftData(usernameToDelete); // Удаляем данные о смене пользователя
+        removeUserVisitRecords(usernameToDelete); // НОВОЕ: Удаляем данные о посещениях пользователя
         showNotification(`Пользователь ${usernameToDelete} успешно удален.`);
-        loadUsersTable(); // Перезагружаем таблицу
+        loadUsersTable(); // Перезагружаем таблицу пользователей
+        loadVisitRecordsTable(); // Перезагружаем таблицу посещений
     }
+}
+
+// НОВАЯ ФУНКЦИЯ: Загрузка таблицы записей о посещениях
+function loadVisitRecordsTable() {
+    const visitRecords = getAllVisitRecords();
+    const visitsTableBody = document.getElementById('visitsTableBody');
+    visitsTableBody.innerHTML = ''; // Очищаем таблицу
+
+    if (visitRecords.length === 0) {
+        const row = visitsTableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 3;
+        cell.textContent = 'Нет записей о посещениях.';
+        cell.style.textAlign = 'center';
+        cell.style.padding = '20px';
+        cell.style.color = 'var(--secondary-text-color)';
+        return;
+    }
+
+    // Сортируем записи по дате (новые сначала)
+    const sortedRecords = [...visitRecords].sort((a, b) => {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+
+    sortedRecords.forEach(record => {
+        const row = visitsTableBody.insertRow();
+
+        row.insertCell().textContent = record.fullName || record.username;
+        row.insertCell().textContent = formatDateTime(record.timestamp);
+
+        const photoCell = row.insertCell();
+        const img = document.createElement('img');
+        img.src = record.photo;
+        img.alt = `Фото ${record.fullName}`;
+        img.style.width = '80px'; // Уменьшаем размер фото для таблицы
+        img.style.height = '80px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '8px';
+        img.style.cursor = 'pointer';
+        img.onclick = () => openPhotoInNewTab(record.photo); // Открывать фото в новой вкладке
+        photoCell.appendChild(img);
+    });
+}
+
+// Вспомогательная функция для открытия фото в новой вкладке
+function openPhotoInNewTab(photoData) {
+    const newTab = window.open();
+    newTab.document.body.innerHTML = `<img src="${photoData}" style="max-width: 100%; height: auto;">`;
 }
 
 // Обновление почасовой ставки

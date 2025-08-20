@@ -81,6 +81,27 @@ function removeUserShiftData(username) {
     localStorage.removeItem(`shift_${username}`);
 }
 
+// НОВЫЕ ФУНКЦИИ ДЛЯ ПОСЕЩЕНИЙ ВНЕ СМЕНЫ
+// Получить все записи о посещениях
+function getAllVisitRecords() {
+    return JSON.parse(localStorage.getItem('visitRecords') || '[]');
+}
+
+// Добавить новую запись о посещении
+function addVisitRecord(record) {
+    const records = getAllVisitRecords();
+    records.push(record);
+    localStorage.setItem('visitRecords', JSON.stringify(records));
+}
+
+// Удалить все записи о посещениях для конкретного пользователя (при удалении пользователя)
+function removeUserVisitRecords(username) {
+    let records = getAllVisitRecords();
+    records = records.filter(record => record.username !== username);
+    localStorage.setItem('visitRecords', JSON.stringify(records));
+}
+// КОНЕЦ НОВЫХ ФУНКЦИЙ
+
 // Форматирование времени
 function formatTime(ms) {
     const hours = Math.floor(ms / 1000 / 60 / 60);
@@ -97,6 +118,18 @@ function formatDate(dateString) {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
+    });
+}
+
+// Форматирование даты и времени
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 

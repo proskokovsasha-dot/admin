@@ -134,7 +134,8 @@
     color: var(--text-color);
 }
 
-.users-list-container {
+.users-list-container,
+.visits-list-container { /* Добавил .visits-list-container */
     background: var(--secondary-bg);
     border-radius: 15px;
     padding: 30px; /* Увеличиваем паддинг */
@@ -142,7 +143,8 @@
     box-shadow: 0 5px 15px var(--shadow-color);
 }
 
-.users-table {
+.users-table,
+.visits-table { /* Добавил .visits-table */
     width: 100%;
     border-collapse: separate; /* Для border-radius на ячейках */
     border-spacing: 0 8px; /* Отступ между строками */
@@ -150,13 +152,16 @@
 }
 
 .users-table th,
-.users-table td {
+.users-table td,
+.visits-table th,
+.visits-table td { /* Добавил .visits-table */
     padding: 15px 20px; /* Увеличиваем паддинг */
     text-align: left;
     border: none; /* Убираем стандартные границы */
 }
 
-.users-table th {
+.users-table th,
+.visits-table th { /* Добавил .visits-table */
     background: var(--primary-bg); /* Светлый фон для заголовков */
     font-weight: 600;
     color: var(--secondary-text-color);
@@ -165,16 +170,19 @@
     letter-spacing: 0.5px;
 }
 
-.users-table th:first-child {
+.users-table th:first-child,
+.visits-table th:first-child { /* Добавил .visits-table */
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
-.users-table th:last-child {
+.users-table th:last-child,
+.visits-table th:last-child { /* Добавил .visits-table */
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
-.users-table td {
+.users-table td,
+.visits-table td { /* Добавил .visits-table */
     color: var(--text-color);
     font-size: 16px;
     background: var(--primary-bg); /* Светлый фон для строк */
@@ -182,7 +190,8 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Легкая тень для строк */
 }
 
-.users-table tr:hover td {
+.users-table tr:hover td,
+.visits-table tr:hover td { /* Добавил .visits-table */
     background: var(--tertiary-bg); /* Чуть темнее при наведении */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
@@ -296,14 +305,18 @@
         font-size: 22px;
     }
 
-    .users-list-container {
+    .users-list-container,
+    .visits-list-container { /* Добавил .visits-list-container */
         padding: 20px;
     }
-    .users-table {
+    .users-table,
+    .visits-table { /* Добавил .visits-table */
         border-spacing: 0 5px;
     }
     .users-table th,
-    .users-table td {
+    .users-table td,
+    .visits-table th,
+    .visits-table td { /* Добавил .visits-table */
         font-size: 13px;
         padding: 12px 15px;
     }
@@ -343,11 +356,14 @@
     .tab-header h2 {
         font-size: 20px;
     }
-    .users-list-container {
+    .users-list-container,
+    .visits-list-container { /* Добавил .visits-list-container */
         padding: 15px;
     }
     .users-table th,
-    .users-table td {
+    .users-table td,
+    .visits-table th,
+    .visits-table td { /* Добавил .visits-table */
         font-size: 12px;
         padding: 10px;
     }

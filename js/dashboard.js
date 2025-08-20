@@ -3,6 +3,7 @@
 let shiftInterval;
 let shiftStartTime = null;
 let currentStream = null;
+let photoPurpose = 'shift'; // 'shift' или 'visit'
 
 // Загрузка личного кабинета
 function loadDashboard() {
@@ -121,13 +122,13 @@ function initEventHandlers() {
     // Кнопка начала смены (в баннере)
     const startShiftBtnBanner = document.getElementById('startShiftBtnBanner');
     if (startShiftBtnBanner) {
-        startShiftBtnBanner.addEventListener('click', startShiftWithPhoto);
+        startShiftBtnBanner.addEventListener('click', () => startShiftWithPhoto('shift'));
     }
 
     // Кнопка начала смены (в блоке действий)
     const startShiftBtn = document.getElementById('startShiftBtn');
     if (startShiftBtn) {
-        startShiftBtn.addEventListener('click', startShiftWithPhoto);
+        startShiftBtn.addEventListener('click', () => startShiftWithPhoto('shift'));
     }
 
     // Кнопка завершения смены
@@ -145,7 +146,7 @@ function initEventHandlers() {
     // Кнопка подтверждения фото
     const confirmPhotoBtn = document.getElementById('confirmPhotoBtn');
     if (confirmPhotoBtn) {
-        confirmPhotoBtn.addEventListener('click', confirmShiftStart);
+        confirmPhotoBtn.addEventListener('click', confirmPhotoAction);
     }
 
     // Кнопка переснять фото
@@ -184,13 +185,31 @@ function initEventHandlers() {
     // Кнопка "Подтвердить фото" в блоке действий (если смена уже активна)
     const photoShiftBtn = document.getElementById('photoShiftBtn');
     if (photoShiftBtn) {
-        photoShiftBtn.addEventListener('click', startShiftWithPhoto); // Используем ту же функцию для запуска модального окна
+        photoShiftBtn.addEventListener('click', () => startShiftWithPhoto('shift')); // Используем ту же функцию для запуска модального окна
+    }
+
+    // Новая кнопка "Отметить посещение"
+    const recordVisitBtn = document.getElementById('recordVisitBtn');
+    if (recordVisitBtn) {
+        recordVisitBtn.addEventListener('click', () => startShiftWithPhoto('visit'));
     }
 }
 
-// Начать смену с фото подтверждением
-function startShiftWithPhoto() {
+// Начать смену с фото подтверждением или отметить посещение
+function startShiftWithPhoto(purpose) {
+    photoPurpose = purpose; // Устанавливаем цель фото
     const modal = document.getElementById('photoModal');
+    const modalTitle = document.getElementById('photoModalTitle');
+    const modalDescription = document.getElementById('photoModalDescription');
+
+    if (purpose === 'shift') {
+        modalTitle.textContent = 'Подтверждение начала смены';
+        modalDescription.textContent = 'Сделайте фото для подтверждения начала смены';
+    } else if (purpose === 'visit') {
+        modalTitle.textContent = 'Отметка посещения вне смены';
+        modalDescription.textContent = 'Сделайте фото для отметки посещения вне смены';
+    }
+
     modal.classList.add('active');
 
     // Сброс состояния кнопок в модальном окне
@@ -224,7 +243,7 @@ async function startCamera() {
         // Если камера недоступна, можно предложить начать смену без фото
         // Или просто закрыть модальное окно и не начинать смену
         document.getElementById('photoModal').classList.remove('active');
-        showNotification('Смена не начата: камера недоступна.', false);
+        showNotification('Действие не выполнено: камера недоступна.', false);
     }
 }
 
@@ -276,8 +295,8 @@ function retakePhoto() {
     startCamera();
 }
 
-// Подтверждение начала смены с фото
-function confirmShiftStart() {
+// Подтверждение действия с фото (смена или посещение)
+function confirmPhotoAction() {
     const canvas = document.getElementById('photoCanvas');
 
     // Проверяем, есть ли изображение на canvas
@@ -295,24 +314,36 @@ function confirmShiftStart() {
         return;
     }
 
-    const shiftData = {
-        active: true,
-        startTime: new Date().toISOString(),
-        photo: photoData // Сохраняем фото
-    };
+    if (photoPurpose === 'shift') {
+        const shiftData = {
+            active: true,
+            startTime: new Date().toISOString(),
+            photo: photoData // Сохраняем фото
+        };
 
-    saveUserShiftData(currentUser.username, shiftData);
+        saveUserShiftData(currentUser.username, shiftData);
 
-    // Начинаем смену
-    shiftStartTime = new Date();
-    startShiftTimer();
-    updateShiftUI(true);
+        // Начинаем смену
+        shiftStartTime = new Date();
+        startShiftTimer();
+        updateShiftUI(true);
+
+        showNotification('Смена начата с фото подтверждением!');
+    } else if (photoPurpose === 'visit') {
+        const visitData = {
+            timestamp: new Date().toISOString(),
+            photo: photoData,
+            username: currentUser.username,
+            fullName: currentUser.fullName || currentUser.username
+        };
+        addVisitRecord(visitData);
+        showNotification('Посещение вне смены успешно отмечено!');
+    }
 
     // Закрываем модальное окно
     document.getElementById('photoModal').classList.remove('active');
-
-    showNotification('Смена начата с фото подтверждением!');
 }
+
 
 // Завершить смену
 function endShift() {
@@ -413,12 +444,14 @@ function updateShiftUI(isActive) {
     const startShiftBtn = document.getElementById('startShiftBtn');
     const endShiftBtn = document.getElementById('endShiftBtn');
     const photoShiftBtn = document.getElementById('photoShiftBtn'); // Кнопка "Подтвердить фото" в блоке действий
+    const recordVisitBtn = document.getElementById('recordVisitBtn'); // Кнопка "Отметить посещение"
 
     if (isActive) {
         if (startShiftBtnBanner) startShiftBtnBanner.style.display = 'none';
         if (startShiftBtn) startShiftBtn.style.display = 'none';
         if (endShiftBtn) endShiftBtn.style.display = 'block';
         if (photoShiftBtn) photoShiftBtn.style.display = 'block'; // Показываем кнопку "Подтвердить фото"
+        if (recordVisitBtn) recordVisitBtn.style.display = 'none'; // Скрываем кнопку "Отметить посещение"
 
         document.getElementById('currentShiftStatus').textContent = 'Смена активна';
         document.getElementById('statusIndicator').classList.add('active');
@@ -427,6 +460,7 @@ function updateShiftUI(isActive) {
         if (startShiftBtn) startShiftBtn.style.display = 'block';
         if (endShiftBtn) endShiftBtn.style.display = 'none';
         if (photoShiftBtn) photoShiftBtn.style.display = 'none'; // Скрываем кнопку "Подтвердить фото"
+        if (recordVisitBtn) recordVisitBtn.style.display = 'block'; // Показываем кнопку "Отметить посещение"
 
         document.getElementById('currentShiftStatus').textContent = 'Смена не начата';
         document.getElementById('statusIndicator').classList.remove('active');
