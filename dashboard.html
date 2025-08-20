@@ -24,19 +24,15 @@
             </div>
 
             <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-tab="dashboard">
+                <a href="#" class="nav-item active" data-modal="dashboard">
                     <i class="fas fa-home"></i>
                     <span>Главная</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="shifts">
+                <a href="#" class="nav-item" data-modal="shifts">
                     <i class="fas fa-history"></i>
                     <span>История смен</span>
                 </a>
-                <a href="#" class="nav-item" data-tab="vacation">
-                    <i class="fas fa-umbrella-beach"></i>
-                    <span>Отпуск и больничные</span>
-                </a>
-                <a href="#" class="nav-item" data-tab="profile">
+                <a href="#" class="nav-item" data-modal="profile">
                     <i class="fas fa-user-cog"></i>
                     <span>Профиль</span>
                 </a>
@@ -71,9 +67,8 @@
                 </div>
             </div>
 
-            <!-- Контент вкладок -->
+            <!-- Контент главной вкладки (остается на основной странице) -->
             <div class="tab-content">
-                <!-- Вкладка Главная -->
                 <div class="tab-pane active" id="dashboard-tab">
                     <div class="stats-cards">
                         <div class="stat-card">
@@ -155,128 +150,11 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Вкладка История смен -->
-                <div class="tab-pane" id="shifts-tab">
-                    <div class="tab-header">
-                        <h2>История смен</h2>
-                        <div class="filter-controls">
-                            <select id="shiftsFilter">
-                                <option value="all">Все смены</option>
-                                <option value="month">Этот месяц</option>
-                                <option value="week">Эта неделя</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="shifts-list" id="shiftsList">
-                        <!-- История смен будет загружена через JS -->
-                    </div>
-                </div>
-
-                <!-- Вкладка Отпуск и больничные -->
-                <div class="tab-pane" id="vacation-tab">
-                    <div class="tab-header">
-                        <h2>Отпуск и больничные</h2>
-                        <button class="btn-primary" id="requestTimeOffBtn">
-                            <i class="fas fa-plus"></i>
-                            Подать заявку
-                        </button>
-                    </div>
-
-                    <div class="timeoff-stats">
-                        <div class="timeoff-stat">
-                            <h3>Доступно отпуска</h3>
-                            <p class="days-available">14 дней</p>
-                        </div>
-                        <div class="timeoff-stat">
-                            <h3>Использовано</h3>
-                            <p class="days-used">5 дней</p>
-                        </div>
-                        <div class="timeoff-stat">
-                            <h3>Больничные</h3>
-                            <p class="sick-days">2 дня</p>
-                        </div>
-                    </div>
-
-                    <div class="requests-list">
-                        <h3>Последние заявки</h3>
-                        <div class="request-item">
-                            <div class="request-info">
-                                <h4>Отпуск</h4>
-                                <p>10.08.2023 - 20.08.2023</p>
-                            </div>
-                            <div class="request-status approved">
-                                <i class="fas fa-check-circle"></i>
-                                <span>Одобрено</span>
-                            </div>
-                        </div>
-                        <div class="request-item">
-                            <div class="request-info">
-                                <h4>Больничный</h4>
-                                <p>05.07.2023 - 07.07.2023</p>
-                            </div>
-                            <div class="request-status pending">
-                                <i class="fas fa-clock"></i>
-                                <span>На рассмотрении</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Вкладка Профиль -->
-                <div class="tab-pane" id="profile-tab">
-                    <div class="tab-header">
-                        <h2>Профиль сотрудника</h2>
-                    </div>
-
-                    <div class="profile-card">
-                        <div class="profile-header">
-                            <div class="profile-avatar">
-                                <img src="https://ui-avatars.com/api/?name=User&background=6A11CB&color=fff" alt="Avatar" id="profileAvatar"> <!-- Обновил цвет фона для дефолтного аватара -->
-                                <button class="avatar-edit">
-                                    <i class="fas fa-camera"></i>
-                                </button>
-                            </div>
-                            <div class="profile-info">
-                                <h2 id="profileName">Имя Фамилия</h2>
-                                <p id="profilePosition">Должность</p>
-                                <p id="profileEmail">user@example.com</p>
-                            </div>
-                        </div>
-
-                        <div class="profile-details">
-                            <div class="detail-item">
-                                <label><i class="fas fa-phone"></i> Телефон:</label>
-                                <span id="profilePhone">+7 (999) 123-45-67</span>
-                            </div>
-                            <div class="detail-item">
-                                <label><i class="fas fa-calendar-alt"></i> Дата регистрации:</label>
-                                <span id="profileJoinDate">01.01.2023</span>
-                            </div>
-                            <div class="detail-item">
-                                <label><i class="fas fa-clock"></i> Всего отработано:</label>
-                                <span id="profileTotalHours">120 часов</span>
-                            </div>
-                        </div>
-
-                        <div class="profile-actions">
-                            <button class="btn-secondary">
-                                <i class="fas fa-edit"></i>
-                                Редактировать профиль
-                            </button>
-                            <button class="btn-secondary">
-                                <i class="fas fa-lock"></i>
-                                Сменить пароль
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для фото подтверждения -->
+    <!-- Модальное окно для фото подтверждения (используется для начала смены и посещения) -->
     <div class="modal" id="photoModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -287,7 +165,7 @@
                 <p id="photoModalDescription" style="color: var(--secondary-text-color); margin-bottom: 15px;">Сделайте фото для подтверждения начала смены</p>
                 <div class="camera-container">
                     <video id="cameraVideo" autoplay playsinline></video>
-                    <canvas id="photoCanvas"></canvas> <!-- Убрал style="display: none;" из HTML, будет управляться JS -->
+                    <canvas id="photoCanvas"></canvas>
                 </div>
                 <div class="camera-controls">
                     <button id="captureBtn" class="btn-primary">
@@ -307,36 +185,78 @@
         </div>
     </div>
 
-    <!-- Модальное окно для заявки на отпуск/больничный -->
-    <div class="modal" id="timeOffModal">
+    <!-- Модальное окно для Истории смен -->
+    <div class="modal" id="shiftsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Подача заявки</h3>
+                <h3>История смен</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="input-group">
-                    <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Тип заявки</label>
-                    <select id="requestType">
-                        <option value="vacation">Отпуск</option>
-                        <option value="sick">Больничный</option>
+                <div class="filter-controls">
+                    <select id="shiftsFilter">
+                        <option value="all">Все смены</option>
+                        <option value="month">Этот месяц</option>
+                        <option value="week">Эта неделя</option>
                     </select>
                 </div>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Дата начала</label>
-                        <input type="date" id="startDate">
+                <div class="shifts-list" id="shiftsList">
+                    <!-- История смен будет загружена через JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для Профиля -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Профиль сотрудника</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img src="https://ui-avatars.com/api/?name=User&background=6A11CB&color=fff" alt="Avatar" id="profileAvatar">
+                            <button class="avatar-edit" id="editAvatarBtn">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profileName">Имя Фамилия</h2>
+                            <p id="profilePosition">Должность</p>
+                            <p id="profileEmail">user@example.com</p>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Дата окончания</label>
-                        <input type="date" id="endDate">
+
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <label><i class="fas fa-phone"></i> Телефон:</label>
+                            <span id="profilePhone">+7 (999) 123-45-67</span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-calendar-alt"></i> Дата регистрации:</label>
+                            <span id="profileJoinDate">01.01.2023</span>
+                        </div>
+                        <div class="detail-item">
+                            <label><i class="fas fa-clock"></i> Всего отработано:</label>
+                            <span id="profileTotalHours">120 часов</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions" style="display: none;">
+                        <button class="btn-secondary">
+                            <i class="fas fa-edit"></i>
+                            Редактировать профиль
+                        </button>
+                        <button class="btn-secondary">
+                            <i class="fas fa-lock"></i>
+                            Сменить пароль
+                        </button>
                     </div>
                 </div>
-                <div class="input-group">
-                    <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Причина</label>
-                    <textarea id="requestReason" placeholder="Укажите причину" rows="4"></textarea> <!-- Добавил rows -->
-                </div>
-                <button class="btn-primary" id="submitRequestBtn">Отправить заявку</button>
             </div>
         </div>
     </div>

@@ -111,9 +111,13 @@ function formatTime(ms) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-// Форматирование даты
+// Форматирование даты (исправлено)
 function formatDate(dateString) {
     const date = new Date(dateString);
+    // Проверяем, является ли дата валидной
+    if (isNaN(date.getTime())) {
+        return 'Неизвестно';
+    }
     return date.toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
@@ -124,6 +128,9 @@ function formatDate(dateString) {
 // Форматирование даты и времени
 function formatDateTime(dateString) {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return 'Неизвестно';
+    }
     return date.toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
@@ -160,13 +167,10 @@ function checkAuth() {
 
     // Если пользователь не админ и пытается зайти на admin.html, перенаправляем на index.html
     if (isAdminPage && (!currentUser || currentUser.username !== ADMIN_USERNAME)) {
-        // Если на странице admin.html, но не авторизован как админ, остаемся на admin.html для логина
-        // Но если уже авторизован как обычный пользователь, перенаправляем на dashboard
         if (currentUser && currentUser.username !== ADMIN_USERNAME) {
              window.location.href = 'dashboard.html';
              return null;
         }
-        // Если не авторизован вообще, остаемся на admin.html для логина
         return null; 
     }
 

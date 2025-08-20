@@ -16,9 +16,6 @@ function loadDashboard() {
     // Обновляем статистику
     updateUserStats(currentUser);
 
-    // Загружаем историю смен
-    loadShiftsHistory();
-
     // Проверяем, была ли активная смена
     const shiftData = getUserShiftData(currentUser.username);
     if (shiftData && shiftData.active) {
@@ -40,29 +37,36 @@ function loadDashboard() {
 function updateUserInfo(user) {
     document.getElementById('userName').textContent = user.fullName || user.username;
     document.getElementById('userPosition').textContent = getPositionName(user.position);
-    document.getElementById('welcomeSubMessage').textContent = `Рады видеть вас снова, ${user.fullName || user.username}!`; // Обновлено для более личного приветствия
+    document.getElementById('welcomeSubMessage').textContent = `Рады видеть вас снова, ${user.fullName || user.username}!`;
 
     // Устанавливаем аватар
-    const avatar = document.getElementById('userAvatar');
-    const profileAvatar = document.getElementById('profileAvatar'); // Для вкладки профиля
-    if (user.avatar) {
-        avatar.src = user.avatar;
-        profileAvatar.src = user.avatar;
-    } else {
-        const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || user.username)}&background=4e54c8&color=fff`;
-        avatar.src = defaultAvatarUrl;
-        profileAvatar.src = defaultAvatarUrl;
-    }
+    updateAvatar(user.avatar);
 
     // Обновляем приветственное сообщение
     updateWelcomeMessage();
 
-    // Обновляем данные профиля
+    // Обновляем данные профиля в модальном окне
     document.getElementById('profileName').textContent = user.fullName || user.username;
     document.getElementById('profilePosition').textContent = getPositionName(user.position);
     document.getElementById('profilePhone').textContent = user.phone || 'Не указан';
     document.getElementById('profileJoinDate').textContent = formatDate(user.registerDate);
     document.getElementById('profileTotalHours').textContent = `${user.stats.totalHours.toFixed(1)} часов`;
+}
+
+// Обновление аватара
+function updateAvatar(avatarData) {
+    const avatar = document.getElementById('userAvatar');
+    const profileAvatar = document.getElementById('profileAvatar');
+
+    if (avatarData) {
+        avatar.src = avatarData;
+        profileAvatar.src = avatarData;
+    } else {
+        const currentUser = getCurrentUser();
+        const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.fullName || currentUser.username)}&background=6A11CB&color=fff`;
+        avatar.src = defaultAvatarUrl;
+        profileAvatar.src = defaultAvatarUrl;
+    }
 }
 
 // Обновление приветственного сообщения
@@ -83,12 +87,12 @@ function updateWelcomeMessage() {
     document.getElementById('welcomeMessage').textContent = message;
 }
 
-// Инициализация навигации
+// Инициализация навигации (теперь открывает модальные окна)
 function initNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
 
     navItems.forEach(item => {
-        if (item.id !== 'logoutBtn') { // Исключаем кнопку выхода из логики переключения вкладок
+        if (item.id !== 'logoutBtn') {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
 
@@ -98,23 +102,32 @@ function initNavigation() {
                 // Добавляем активный класс текущему элементу
                 this.classList.add('active');
 
-                // Показываем соответствующую вкладку
-                const tabName = this.getAttribute('data-tab');
-                showTab(tabName);
+                const modalName = this.getAttribute('data-modal');
+                openModal(modalName);
             });
         }
     });
 }
 
-// Показать вкладку
-function showTab(tabName) {
-    // Скрываем все вкладки
-    document.querySelectorAll('.tab-pane').forEach(tab => {
-        tab.classList.remove('active');
+// Открыть модальное окно
+function openModal(modalName) {
+    // Скрываем все модальные окна
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.remove('active');
     });
 
-    // Показываем выбранную вкладку
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+    // Показываем выбранное модальное окно
+    const targetModal = document.getElementById(`${modalName}Modal`);
+    if (targetModal) {
+        targetModal.classList.add('active');
+        // Дополнительная логика для загрузки данных в модальное окно
+        if (modalName === 'shifts') {
+            loadShiftsHistory();
+        } else if (modalName === 'profile') {
+            const currentUser = getCurrentUser();
+            updateUserInfo(currentUser); // Обновляем данные профиля перед открытием
+        }
+    }
 }
 
 // Инициализация обработчиков событий
@@ -166,32 +179,65 @@ function initEventHandlers() {
         btn.addEventListener('click', function() {
             this.closest('.modal').classList.remove('active');
             stopCamera(); // Останавливаем камеру при закрытии модального окна
+            // Снимаем активный класс с навигации, если модальное окно закрыто
+            document.querySelectorAll('.nav-item').forEach(navItem => navItem.classList.remove('active'));
+            // Устанавливаем активный класс на "Главная"
+            document.querySelector('.nav-item[data-modal="dashboard"]').classList.add('active');
         });
     });
-
-    // Заявка на отпуск/больничный
-    const requestTimeOffBtn = document.getElementById('requestTimeOffBtn');
-    if (requestTimeOffBtn) {
-        requestTimeOffBtn.addEventListener('click', function() {
-            document.getElementById('timeOffModal').classList.add('active');
-        });
-    }
-
-    const submitRequestBtn = document.getElementById('submitRequestBtn');
-    if (submitRequestBtn) {
-        submitRequestBtn.addEventListener('click', submitTimeOffRequest);
-    }
 
     // Кнопка "Подтвердить фото" в блоке действий (если смена уже активна)
     const photoShiftBtn = document.getElementById('photoShiftBtn');
     if (photoShiftBtn) {
-        photoShiftBtn.addEventListener('click', () => startShiftWithPhoto('shift')); // Используем ту же функцию для запуска модального окна
+        photoShiftBtn.addEventListener('click', () => startShiftWithPhoto('shift'));
     }
 
     // Новая кнопка "Отметить посещение"
     const recordVisitBtn = document.getElementById('recordVisitBtn');
     if (recordVisitBtn) {
         recordVisitBtn.addEventListener('click', () => startShiftWithPhoto('visit'));
+    }
+
+    // Обработчик для кнопки редактирования аватара
+    const editAvatarBtn = document.getElementById('editAvatarBtn');
+    if (editAvatarBtn) {
+        editAvatarBtn.addEventListener('click', () => {
+            document.getElementById('avatarInput').click();
+        });
+    }
+
+    // Обработчик для input type="file"
+    const avatarInput = document.getElementById('avatarInput');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', handleAvatarUpload);
+    }
+
+    // Обработчик для фильтра истории смен
+    const shiftsFilter = document.getElementById('shiftsFilter');
+    if (shiftsFilter) {
+        shiftsFilter.addEventListener('change', loadShiftsHistory);
+    }
+}
+
+// Обработка загрузки аватара
+function handleAvatarUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imageData = e.target.result;
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                const users = getUsers();
+                users[currentUser.username].avatar = imageData;
+                saveUsers(users);
+                currentUser.avatar = imageData; // Обновляем текущего пользователя
+                saveCurrentUser(currentUser);
+                updateAvatar(imageData); // Обновляем аватар на странице
+                showNotification('Фото профиля успешно обновлено!');
+            }
+        };
+        reader.readAsDataURL(file);
     }
 }
 
@@ -240,8 +286,6 @@ async function startCamera() {
         console.error('Ошибка доступа к камере:', error);
         showNotification('Не удалось получить доступ к камере. Пожалуйста, разрешите доступ.', false);
 
-        // Если камера недоступна, можно предложить начать смену без фото
-        // Или просто закрыть модальное окно и не начинать смену
         document.getElementById('photoModal').classList.remove('active');
         showNotification('Действие не выполнено: камера недоступна.', false);
     }
@@ -253,7 +297,7 @@ function stopCamera() {
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
         const video = document.getElementById('cameraVideo');
-        video.srcObject = null; // Очищаем srcObject
+        video.srcObject = null;
     }
 }
 
@@ -263,17 +307,13 @@ function capturePhoto() {
     const canvas = document.getElementById('photoCanvas');
     const context = canvas.getContext('2d');
 
-    // Устанавливаем размеры canvas как у video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Рисуем текущий кадр видео на canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Останавливаем камеру
     stopCamera();
 
-    // Меняем кнопки
     document.getElementById('captureBtn').style.display = 'none';
     document.getElementById('retakeBtn').style.display = 'block';
     document.getElementById('confirmPhotoBtn').style.display = 'block';
@@ -281,17 +321,14 @@ function capturePhoto() {
 
 // Переснять фото
 function retakePhoto() {
-    // Показываем кнопку захвата снова
     document.getElementById('captureBtn').style.display = 'block';
     document.getElementById('retakeBtn').style.display = 'none';
     document.getElementById('confirmPhotoBtn').style.display = 'none';
 
-    // Очищаем canvas
     const canvas = document.getElementById('photoCanvas');
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Запускаем камеру снова
     startCamera();
 }
 
@@ -299,13 +336,11 @@ function retakePhoto() {
 function confirmPhotoAction() {
     const canvas = document.getElementById('photoCanvas');
 
-    // Проверяем, есть ли изображение на canvas
     if (canvas.width === 0 || canvas.height === 0) {
         showNotification('Сначала сделайте фото!', false);
         return;
     }
 
-    // Получаем данные фото в формате base64
     const photoData = canvas.toDataURL('image/jpeg');
 
     const currentUser = getCurrentUser();
@@ -318,12 +353,11 @@ function confirmPhotoAction() {
         const shiftData = {
             active: true,
             startTime: new Date().toISOString(),
-            photo: photoData // Сохраняем фото
+            photo: photoData
         };
 
         saveUserShiftData(currentUser.username, shiftData);
 
-        // Начинаем смену
         shiftStartTime = new Date();
         startShiftTimer();
         updateShiftUI(true);
@@ -340,31 +374,26 @@ function confirmPhotoAction() {
         showNotification('Посещение вне смены успешно отмечено!');
     }
 
-    // Закрываем модальное окно
     document.getElementById('photoModal').classList.remove('active');
 }
-
 
 // Завершить смену
 function endShift() {
     const currentUser = getCurrentUser();
     if (!currentUser) return;
 
-    // Проверяем, была ли смена начата
     if (!shiftStartTime) {
         showNotification('Смена не была начата.', false);
         return;
     }
 
     const endTime = new Date();
-    const shiftDuration = (endTime - shiftStartTime) / 1000 / 60 / 60; // в часах
-    const earnings = shiftDuration * getHourlyRate(); // Используем getHourlyRate()
+    const shiftDuration = (endTime - shiftStartTime) / 1000 / 60 / 60;
+    const earnings = shiftDuration * getHourlyRate();
 
-    // Обновляем статистику пользователя
     const users = getUsers();
-    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const currentMonth = new Date().toISOString().slice(0, 7);
 
-    // Убедимся, что stats и shifts существуют
     if (!users[currentUser.username].stats) {
         users[currentUser.username].stats = { totalHours: 0, totalEarnings: 0, monthlyEarnings: {} };
     }
@@ -381,39 +410,30 @@ function endShift() {
 
     users[currentUser.username].stats.monthlyEarnings[currentMonth] += earnings;
 
-    // Сохраняем историю смен
     users[currentUser.username].shifts.push({
         startTime: shiftStartTime.toISOString(),
         endTime: endTime.toISOString(),
         duration: shiftDuration,
         earnings: earnings,
-        date: new Date().toISOString().slice(0, 10)
+        date: new Date().toISOString() // Сохраняем полную дату для сортировки
     });
 
-    // Сохраняем обновленные данные
     saveUsers(users);
-
-    // Удаляем данные о текущей смене
     removeUserShiftData(currentUser.username);
 
-    // Обновляем текущего пользователя в localStorage
     const updatedUser = {
         ...currentUser,
         ...users[currentUser.username]
     };
     saveCurrentUser(updatedUser);
 
-    // Обновляем UI
     clearInterval(shiftInterval);
     document.getElementById('currentShiftTime').textContent = '00:00:00';
     document.getElementById('currentEarnings').textContent = '0 руб.';
     updateShiftUI(false);
 
-    // Обновляем статистику на дашборде
     updateUserStats(updatedUser);
-
-    // Перезагружаем историю смен
-    loadShiftsHistory();
+    loadShiftsHistory(); // Обновляем историю смен после завершения
 
     showNotification(`Смена завершена! Заработано: ${earnings.toFixed(2)} руб.`);
     shiftStartTime = null;
@@ -427,12 +447,10 @@ function startShiftTimer() {
         const currentTime = new Date();
         const diff = currentTime - shiftStartTime;
 
-        // Обновляем таймер
         document.getElementById('currentShiftTime').textContent = formatTime(diff);
 
-        // Рассчитываем заработок
         const hoursWorked = diff / 1000 / 60 / 60;
-        const currentEarnings = hoursWorked * getHourlyRate(); // Используем getHourlyRate()
+        const currentEarnings = hoursWorked * getHourlyRate();
 
         document.getElementById('currentEarnings').textContent = `${currentEarnings.toFixed(2)} руб.`;
     }, 1000);
@@ -443,15 +461,15 @@ function updateShiftUI(isActive) {
     const startShiftBtnBanner = document.getElementById('startShiftBtnBanner');
     const startShiftBtn = document.getElementById('startShiftBtn');
     const endShiftBtn = document.getElementById('endShiftBtn');
-    const photoShiftBtn = document.getElementById('photoShiftBtn'); // Кнопка "Подтвердить фото" в блоке действий
-    const recordVisitBtn = document.getElementById('recordVisitBtn'); // Кнопка "Отметить посещение"
+    const photoShiftBtn = document.getElementById('photoShiftBtn');
+    const recordVisitBtn = document.getElementById('recordVisitBtn');
 
     if (isActive) {
         if (startShiftBtnBanner) startShiftBtnBanner.style.display = 'none';
         if (startShiftBtn) startShiftBtn.style.display = 'none';
         if (endShiftBtn) endShiftBtn.style.display = 'block';
-        if (photoShiftBtn) photoShiftBtn.style.display = 'block'; // Показываем кнопку "Подтвердить фото"
-        if (recordVisitBtn) recordVisitBtn.style.display = 'none'; // Скрываем кнопку "Отметить посещение"
+        if (photoShiftBtn) photoShiftBtn.style.display = 'block';
+        if (recordVisitBtn) recordVisitBtn.style.display = 'none';
 
         document.getElementById('currentShiftStatus').textContent = 'Смена активна';
         document.getElementById('statusIndicator').classList.add('active');
@@ -459,20 +477,19 @@ function updateShiftUI(isActive) {
         if (startShiftBtnBanner) startShiftBtnBanner.style.display = 'block';
         if (startShiftBtn) startShiftBtn.style.display = 'block';
         if (endShiftBtn) endShiftBtn.style.display = 'none';
-        if (photoShiftBtn) photoShiftBtn.style.display = 'none'; // Скрываем кнопку "Подтвердить фото"
-        if (recordVisitBtn) recordVisitBtn.style.display = 'block'; // Показываем кнопку "Отметить посещение"
+        if (photoShiftBtn) photoShiftBtn.style.display = 'none';
+        if (recordVisitBtn) recordVisitBtn.style.display = 'block';
 
         document.getElementById('currentShiftStatus').textContent = 'Смена не начата';
         document.getElementById('statusIndicator').classList.remove('active');
-        document.getElementById('currentShiftTime').textContent = '00:00:00'; // Сброс таймера
-        document.getElementById('currentEarnings').textContent = '0 руб.'; // Сброс заработка
+        document.getElementById('currentShiftTime').textContent = '00:00:00';
+        document.getElementById('currentEarnings').textContent = '0 руб.';
     }
 }
 
 // Обновить статистику пользователя
 function updateUserStats(user) {
     if (!user || !user.stats) {
-        // Инициализируем stats, если его нет
         user.stats = { totalHours: 0, totalEarnings: 0, monthlyEarnings: {} };
     }
 
@@ -483,7 +500,6 @@ function updateUserStats(user) {
     const monthEarnings = user.stats.monthlyEarnings[currentMonth] || 0;
     document.getElementById('monthEarnings').textContent = `${monthEarnings.toFixed(2)} руб.`;
 
-    // Подсчет смен в этом месяце
     let shiftsThisMonth = 0;
     if (user.shifts) {
         const currentMonthPrefix = new Date().toISOString().slice(0, 7);
@@ -493,7 +509,6 @@ function updateUserStats(user) {
     }
     document.getElementById('shiftsThisMonth').textContent = shiftsThisMonth;
 
-    // Расчет средней продолжительности смены
     let avgShift = 0;
     if (user.shifts && user.shifts.length > 0) {
         const totalHours = user.shifts.reduce((sum, shift) => sum + (shift.duration || 0), 0);
@@ -514,24 +529,33 @@ function loadShiftsHistory() {
     }
 
     const shiftsList = document.getElementById('shiftsList');
-    if (!shiftsList) return; // Проверка на существование элемента
+    if (!shiftsList) return;
 
     shiftsList.innerHTML = '';
 
-    // Сортируем смены по дате (новые сначала)
-    const sortedShifts = [...currentUser.shifts].sort((a, b) => {
+    const filterValue = document.getElementById('shiftsFilter').value;
+    let filteredShifts = [...currentUser.shifts];
+
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const currentWeekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)); // Пн - Вс
+
+    if (filterValue === 'month') {
+        filteredShifts = filteredShifts.filter(shift => new Date(shift.date) >= currentMonthStart);
+    } else if (filterValue === 'week') {
+        filteredShifts = filteredShifts.filter(shift => new Date(shift.date) >= currentWeekStart);
+    }
+
+    const sortedShifts = filteredShifts.sort((a, b) => {
         return new Date(b.date) - new Date(a.date);
     });
 
-    // Ограничиваем количество отображаемых смен
-    const recentShifts = sortedShifts.slice(0, 10);
-
-    if (recentShifts.length === 0) {
-        shiftsList.innerHTML = '<div class="shift-item"><p>Нет данных о сменах</p></div>';
+    if (sortedShifts.length === 0) {
+        shiftsList.innerHTML = '<div class="shift-item"><p>Нет данных о сменах по выбранному фильтру.</p></div>';
         return;
     }
 
-    recentShifts.forEach(shift => {
+    sortedShifts.forEach(shift => {
         const shiftItem = document.createElement('div');
         shiftItem.className = 'shift-item';
 
@@ -560,35 +584,10 @@ function loadShiftsHistory() {
     });
 }
 
-// Подача заявки на отпуск/больничный
-function submitTimeOffRequest() {
-    const type = document.getElementById('requestType').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const reason = document.getElementById('requestReason').value;
-
-    if (!startDate || !endDate || !reason) {
-        showNotification('Заполните все поля', false);
-        return;
-    }
-
-    // Здесь будет логика отправки заявки
-    // В демо-версии просто показываем уведомление
-
-    showNotification('Заявка отправлена на рассмотрение');
-    document.getElementById('timeOffModal').classList.remove('active');
-
-    // Очищаем форму
-    document.getElementById('startDate').value = '';
-    document.getElementById('endDate').value = '';
-    document.getElementById('requestReason').value = '';
-}
-
 // Выход из аккаунта
 function logout() {
     const currentUser = getCurrentUser();
 
-    // Если смена активна, предупреждаем пользователя
     if (currentUser) {
         const shiftData = getUserShiftData(currentUser.username);
         if (shiftData && shiftData.active) {
