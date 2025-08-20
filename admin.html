@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/auth.css"> <!-- Используем некоторые стили аутентификации для логина -->
     <link rel="stylesheet" href="css/admin.css"> <!-- Новые стили для админ-панели -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Rubik уже подключен в style.css, но можно оставить для явности, если хотите -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -88,7 +89,7 @@
             <div class="admin-tab-content">
                 <!-- Вкладка Пользователи -->
                 <div class="admin-tab-pane active" id="users-tab">
-                    <div class="tab-header">
+                    <div class="tab-header"> <!-- Добавил класс tab-header -->
                         <h2>Список пользователей</h2>
                     </div>
                     <div class="users-list-container">
@@ -111,7 +112,7 @@
 
                 <!-- Вкладка Настройки -->
                 <div class="admin-tab-pane" id="settings-tab">
-                    <div class="tab-header">
+                    <div class="tab-header"> <!-- Добавил класс tab-header -->
                         <h2>Настройки системы</h2>
                     </div>
                     <div class="settings-card">

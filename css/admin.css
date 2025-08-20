@@ -2,40 +2,43 @@
 .admin-dashboard-container {
     display: flex;
     min-height: 100vh;
-    background: #1a1f3b;
-    color: #fff;
+    background: var(--primary-bg); /* Светлый фон */
+    color: var(--text-color); /* Темный текст */
 }
 
 .admin-sidebar {
     width: 280px;
-    background: #2a2f4c;
-    padding: 20px;
+    background: var(--secondary-bg); /* Белый фон */
+    padding: 25px 20px;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 2px 0 10px var(--shadow-color);
 }
 
 .admin-sidebar-header {
     text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .admin-sidebar-header i {
-    font-size: 48px;
-    color: #6a11cb;
-    margin-bottom: 15px;
+    font-size: 56px; /* Чуть больше */
+    color: var(--accent-color-1);
+    margin-bottom: 18px; /* Чуть больше отступ */
 }
 
 .admin-sidebar-header h2 {
-    font-size: 24px;
+    font-size: 22px; /* Чуть больше */
+    font-weight: 600;
     margin-bottom: 5px;
+    color: var(--text-color);
 }
 
 .admin-sidebar-header p {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
+    color: var(--secondary-text-color);
+    font-size: 15px;
 }
 
 .admin-sidebar-nav {
@@ -45,54 +48,69 @@
 .admin-nav-item {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
-    color: rgba(255, 255, 255, 0.7);
+    padding: 14px 18px;
+    color: var(--secondary-text-color);
     text-decoration: none;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: all 0.3s;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 16px;
 }
 
 .admin-nav-item i {
-    margin-right: 12px;
-    font-size: 18px;
+    margin-right: 15px;
+    font-size: 20px;
+    color: var(--secondary-text-color);
 }
 
 .admin-nav-item:hover {
-    background: rgba(106, 17, 203, 0.2);
-    color: white;
+    background: var(--tertiary-bg);
+    color: var(--text-color);
+}
+
+.admin-nav-item:hover i {
+    color: var(--text-color);
 }
 
 .admin-nav-item.active {
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-nav-item.active i {
     color: white;
 }
 
 .admin-main-content {
     flex: 1;
-    padding: 20px;
+    padding: 30px;
     overflow-y: auto;
 }
 
 .admin-header {
-    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 30px;
+    background: var(--gradient-primary);
+    border-radius: 18px;
+    padding: 30px;
+    margin-bottom: 35px;
+    color: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .admin-header h1 {
-    font-size: 28px;
-    margin-bottom: 5px;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
 .admin-header p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 17px;
 }
 
 .admin-tab-content {
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .admin-tab-pane {
@@ -103,83 +121,142 @@
     display: block;
 }
 
+.tab-header { /* Добавил этот класс, чтобы использовать общие стили из dashboard.css */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.tab-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
 .users-list-container {
-    background: #2a2f4c;
+    background: var(--secondary-bg);
     border-radius: 15px;
-    padding: 25px;
-    overflow-x: auto; /* Для адаптивности таблицы */
+    padding: 30px; /* Увеличиваем паддинг */
+    overflow-x: auto;
+    box-shadow: 0 5px 15px var(--shadow-color);
 }
 
 .users-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+    border-collapse: separate; /* Для border-radius на ячейках */
+    border-spacing: 0 8px; /* Отступ между строками */
+    margin-top: 15px; /* Чуть меньше отступ */
 }
 
 .users-table th,
 .users-table td {
-    padding: 12px 15px;
+    padding: 15px 20px; /* Увеличиваем паддинг */
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border: none; /* Убираем стандартные границы */
 }
 
 .users-table th {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--primary-bg); /* Светлый фон для заголовков */
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--secondary-text-color);
+    font-size: 15px;
+    text-transform: uppercase; /* Заглавные буквы */
+    letter-spacing: 0.5px;
+}
+
+.users-table th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.users-table th:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .users-table td {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-color);
+    font-size: 16px;
+    background: var(--primary-bg); /* Светлый фон для строк */
+    border-radius: 10px; /* Скругленные углы для строк */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Легкая тень для строк */
 }
 
-.users-table tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+.users-table tr:hover td {
+    background: var(--tertiary-bg); /* Чуть темнее при наведении */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .users-table .action-buttons {
     display: flex;
-    gap: 8px;
+    gap: 10px; /* Чуть больше отступ */
 }
 
 .users-table .action-buttons button {
-    padding: 8px 12px;
+    padding: 10px 15px; /* Увеличиваем паддинг */
     border-radius: 8px;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .users-table .action-buttons .delete-btn {
-    background: #ff4757;
+    background: var(--error-color);
     color: white;
     border: none;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.2);
 }
 
 .users-table .action-buttons .delete-btn:hover {
     background: #e03c4c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
 }
 
 .settings-card {
-    background: #2a2f4c;
+    background: var(--secondary-bg);
     border-radius: 15px;
-    padding: 25px;
+    padding: 30px;
+    box-shadow: 0 5px 15px var(--shadow-color);
 }
 
 .settings-card h3 {
-    font-size: 20px;
-    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-color);
 }
 
 .settings-card p {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--secondary-text-color);
 }
 
 .settings-card #currentHourlyRate {
     font-weight: 700;
-    color: #2ed573;
+    color: var(--success-color);
+    font-size: 18px;
+}
+
+.settings-card .input-group { /* Используем стили input-group из auth.css */
+    margin-bottom: 25px;
+}
+
+.settings-card .input-group input {
+    padding: 16px 18px 16px 50px;
+    background: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-color);
+    font-size: 17px;
+}
+
+.settings-card .input-group input:focus {
+    border-color: var(--accent-color-1);
+    background: var(--secondary-bg);
+    box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
 }
 
 /* Адаптивность для админ-панели */
@@ -190,23 +267,102 @@
 
     .admin-sidebar {
         width: 100%;
-        padding: 15px;
+        padding: 20px;
         border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 2px 10px var(--shadow-color);
     }
 
     .admin-main-content {
-        padding: 15px;
+        padding: 20px;
     }
 
+    .admin-header {
+        padding: 20px;
+    }
+    .admin-header h1 {
+        font-size: 28px;
+    }
+    .admin-header p {
+        font-size: 16px;
+    }
+
+    .tab-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .tab-header h2 {
+        font-size: 22px;
+    }
+
+    .users-list-container {
+        padding: 20px;
+    }
+    .users-table {
+        border-spacing: 0 5px;
+    }
     .users-table th,
     .users-table td {
-        font-size: 12px;
-        padding: 8px;
+        font-size: 13px;
+        padding: 12px 15px;
     }
 
     .users-table .action-buttons button {
-        padding: 6px 8px;
+        padding: 8px 12px;
         font-size: 12px;
+    }
+    .settings-card {
+        padding: 20px;
+    }
+    .settings-card h3 {
+        font-size: 20px;
+    }
+    .settings-card p {
+        font-size: 15px;
+    }
+    .settings-card .input-group input {
+        font-size: 16px;
+        padding: 14px 16px 14px 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-main-content {
+        padding: 15px;
+    }
+    .admin-header {
+        padding: 15px;
+    }
+    .admin-header h1 {
+        font-size: 24px;
+    }
+    .admin-header p {
+        font-size: 15px;
+    }
+    .tab-header h2 {
+        font-size: 20px;
+    }
+    .users-list-container {
+        padding: 15px;
+    }
+    .users-table th,
+    .users-table td {
+        font-size: 12px;
+        padding: 10px;
+    }
+    .users-table .action-buttons button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    .settings-card {
+        padding: 15px;
+    }
+    .settings-card h3 {
+        font-size: 18px;
+    }
+    .settings-card .input-group input {
+        font-size: 15px;
+        padding: 12px 14px 12px 40px;
     }
 }

@@ -6,7 +6,8 @@
     <title>Личный кабинет - TimeCafe</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Rubik уже подключен в style.css, но можно оставить для явности, если хотите -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -15,7 +16,7 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="user-avatar">
-                    <img src="https://ui-avatars.com/api/?name=User&background=4e54c8&color=fff" alt="Avatar" id="userAvatar">
+                    <img src="https://ui-avatars.com/api/?name=User&background=6A11CB&color=fff" alt="Avatar" id="userAvatar"> <!-- Обновил цвет фона для дефолтного аватара -->
                     <span class="online-status"></span>
                 </div>
                 <h2 id="userName">Имя пользователя</h2>
@@ -226,7 +227,7 @@
                     <div class="profile-card">
                         <div class="profile-header">
                             <div class="profile-avatar">
-                                <img src="https://ui-avatars.com/api/?name=User&background=4e54c8&color=fff" alt="Avatar" id="profileAvatar">
+                                <img src="https://ui-avatars.com/api/?name=User&background=6A11CB&color=fff" alt="Avatar" id="profileAvatar"> <!-- Обновил цвет фона для дефолтного аватара -->
                                 <button class="avatar-edit">
                                     <i class="fas fa-camera"></i>
                                 </button>
@@ -277,10 +278,10 @@
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Сделайте фото для подтверждения начала смены</p>
+                <p style="color: var(--secondary-text-color); margin-bottom: 15px;">Сделайте фото для подтверждения начала смены</p>
                 <div class="camera-container">
                     <video id="cameraVideo" autoplay playsinline></video>
-                    <canvas id="photoCanvas" style="display: none;"></canvas>
+                    <canvas id="photoCanvas"></canvas> <!-- Убрал style="display: none;" из HTML, будет управляться JS -->
                 </div>
                 <div class="camera-controls">
                     <button id="captureBtn" class="btn-primary">
@@ -309,7 +310,7 @@
             </div>
             <div class="modal-body">
                 <div class="input-group">
-                    <label>Тип заявки</label>
+                    <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Тип заявки</label>
                     <select id="requestType">
                         <option value="vacation">Отпуск</option>
                         <option value="sick">Больничный</option>
@@ -317,17 +318,17 @@
                 </div>
                 <div class="form-row">
                     <div class="input-group">
-                        <label>Дата начала</label>
+                        <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Дата начала</label>
                         <input type="date" id="startDate">
                     </div>
                     <div class="input-group">
-                        <label>Дата окончания</label>
+                        <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Дата окончания</label>
                         <input type="date" id="endDate">
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>Причина</label>
-                    <textarea id="requestReason" placeholder="Укажите причину"></textarea>
+                    <label style="color: var(--secondary-text-color); margin-bottom: 8px; display: block; font-size: 15px;">Причина</label>
+                    <textarea id="requestReason" placeholder="Укажите причину" rows="4"></textarea> <!-- Добавил rows -->
                 </div>
                 <button class="btn-primary" id="submitRequestBtn">Отправить заявку</button>
             </div>
