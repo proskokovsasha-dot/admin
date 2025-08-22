@@ -162,6 +162,16 @@
             </div>
             <div class="modal-body">
                 <p id="photoModalDescription" style="color: var(--secondary-text-color); margin-bottom: 15px;">Сделайте фото для подтверждения начала смены</p>
+                
+                <!-- НОВОЕ: Выбор второго сотрудника -->
+                <div class="input-group" id="secondEmployeeSelectGroup" style="margin-bottom: 20px; display: none;">
+                    <i class="fas fa-user-plus"></i>
+                    <select id="secondEmployeeUsername">
+                        <option value="">Выберите второго сотрудника (необязательно)</option>
+                        <!-- Опции будут загружены через JS -->
+                    </select>
+                </div>
+
                 <div class="camera-container">
                     <video id="cameraVideo" autoplay playsinline></video>
                     <canvas id="photoCanvas"></canvas>

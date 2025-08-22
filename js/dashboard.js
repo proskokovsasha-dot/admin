@@ -5,6 +5,7 @@ let shiftStartTime = null;
 let currentStream = null;
 let photoPurpose = 'shift'; // 'shift', 'visit', или 'cleanup'
 let cleanupPhotos = []; // Массив для хранения фотографий уборки перед завершением смены
+let secondEmployeeForShift = null; // НОВОЕ: Для хранения имени второго сотрудника
 
 // Загрузка личного кабинета
 function loadDashboard() {
@@ -147,6 +148,8 @@ function openModal(modalName) {
             updateCleanupPhotoPreview();
             document.getElementById('dailyRevenue').value = ''; // Очищаем поле выручки
             document.getElementById('shiftEndReason').value = ''; // Очищаем поле причины
+        } else if (modalName === 'photo') { // НОВОЕ: Для модального окна фото
+            populateSecondEmployeeSelect(); // Заполняем список вторых сотрудников
         }
     }
 }
@@ -372,6 +375,24 @@ function updateCleanupPhotoPreview() {
     document.getElementById('cleanupPhotoCount').textContent = `Загружено: ${cleanupPhotos.length} фото (минимум 3)`;
 }
 
+// НОВОЕ: Заполнение выпадающего списка вторых сотрудников
+function populateSecondEmployeeSelect() {
+    const selectElement = document.getElementById('secondEmployeeUsername');
+    selectElement.innerHTML = '<option value="">Выберите второго сотрудника (необязательно)</option>'; // Очищаем и добавляем дефолтную опцию
+
+    const currentUser = getCurrentUser();
+    const users = getUsers();
+
+    for (const username in users) {
+        // Исключаем текущего пользователя и администратора
+        if (username !== currentUser.username && username !== ADMIN_USERNAME) {
+            const option = document.createElement('option');
+            option.value = username;
+            option.textContent = users[username].fullName || username;
+            selectElement.appendChild(option);
+        }
+    }
+}
 
 // Начать смену с фото подтверждением или отметить посещение
 function startShiftWithPhoto(purpose) {
@@ -379,13 +400,18 @@ function startShiftWithPhoto(purpose) {
     const modal = document.getElementById('photoModal');
     const modalTitle = document.getElementById('photoModalTitle');
     const modalDescription = document.getElementById('photoModalDescription');
+    const secondEmployeeSelectGroup = document.getElementById('secondEmployeeSelectGroup');
 
     if (purpose === 'shift') {
         modalTitle.textContent = 'Подтверждение начала смены';
         modalDescription.textContent = 'Сделайте фото для подтверждения начала смены';
+        secondEmployeeSelectGroup.style.display = 'block'; // Показываем выбор второго сотрудника
+        populateSecondEmployeeSelect(); // Заполняем список
     } else if (purpose === 'visit') {
         modalTitle.textContent = 'Отметка посещения вне смены';
         modalDescription.textContent = 'Сделайте фото для отметки посещения вне смены';
+        secondEmployeeSelectGroup.style.display = 'none'; // Скрываем выбор второго сотрудника
+        secondEmployeeForShift = null; // Сбрасываем выбор
     }
 
     modal.classList.add('active');
@@ -482,19 +508,29 @@ function confirmPhotoAction() {
     }
 
     if (photoPurpose === 'shift') {
-        const shiftData = {
-            active: true,
-            startTime: new Date().toISOString(),
-            photo: photoData
-        };
+        const selectedSecondEmployee = document.getElementById('secondEmployeeUsername').value;
+        
+        // Проверяем, не выбрал ли пользователь себя в качестве второго сотрудника
+        if (selectedSecondEmployee && selectedSecondEmployee === currentUser.username) {
+            showNotification('Вы не можете выбрать себя в качестве второго сотрудника.', false);
+            return;
+        }
 
-        saveUserShiftData(currentUser.username, shiftData);
+        // Начинаем смену для текущего пользователя
+        startSingleShift(currentUser.username, photoData);
+        showNotification(`Смена для ${currentUser.fullName || currentUser.username} начата с фото подтверждением!`);
 
+        // Если выбран второй сотрудник, начинаем смену и для него
+        if (selectedSecondEmployee) {
+            startSingleShift(selectedSecondEmployee, photoData);
+            showNotification(`Смена для ${getUsers()[selectedSecondEmployee].fullName || selectedSecondEmployee} также начата!`);
+        }
+        
+        // Обновляем UI только для текущего пользователя
         shiftStartTime = new Date();
         startShiftTimer();
         updateShiftUI(true);
 
-        showNotification('Смена начата с фото подтверждением!');
     } else if (photoPurpose === 'visit') {
         const visitData = {
             timestamp: new Date().toISOString(),
@@ -508,6 +544,19 @@ function confirmPhotoAction() {
 
     document.getElementById('photoModal').classList.remove('active');
 }
+
+// НОВОЕ: Функция для начала смены для одного пользователя
+function startSingleShift(username, photoData) {
+    const shiftData = {
+        active: true,
+        startTime: new Date().toISOString(),
+        photo: photoData,
+        // НОВОЕ: Добавляем информацию о втором сотруднике, если он есть
+        partnerUsername: document.getElementById('secondEmployeeUsername').value || null
+    };
+    saveUserShiftData(username, shiftData);
+}
+
 
 // Завершить смену (обновлено для выручки и фото уборки)
 function endShift(reason = 'Не указана', dailyRevenue = 0, cleanupPhotosData = []) {
@@ -526,22 +575,6 @@ function endShift(reason = 'Не указана', dailyRevenue = 0, cleanupPhoto
     const users = getUsers();
     const currentMonth = new Date().toISOString().slice(0, 7);
 
-    if (!users[currentUser.username].stats) {
-        users[currentUser.username].stats = { totalHours: 0, totalEarnings: 0, monthlyEarnings: {} };
-    }
-    if (!users[currentUser.username].shifts) {
-        users[currentUser.username].shifts = [];
-    }
-
-    users[currentUser.username].stats.totalHours += shiftDuration;
-    users[currentUser.username].stats.totalEarnings += earnings;
-
-    if (!users[currentUser.username].stats.monthlyEarnings[currentMonth]) {
-        users[currentUser.username].stats.monthlyEarnings[currentMonth] = 0;
-    }
-
-    users[currentUser.username].stats.monthlyEarnings[currentMonth] += earnings;
-
     // Сохраняем фотографии уборки отдельно и получаем их ID
     const cleanupPhotoIds = cleanupPhotosData.map(photoData => {
         const photoId = generateId(); // Генерируем уникальный ID для фото
@@ -554,19 +587,23 @@ function endShift(reason = 'Не указана', dailyRevenue = 0, cleanupPhoto
         return photoId;
     });
 
-    users[currentUser.username].shifts.push({
-        startTime: shiftStartTime.toISOString(),
-        endTime: endTime.toISOString(),
-        duration: shiftDuration,
-        earnings: earnings,
-        date: new Date().toISOString(), // Сохраняем полную дату для сортировки
-        endReason: reason, // Причина завершения
-        dailyRevenue: dailyRevenue, // НОВОЕ: Выручка за смену
-        cleanupPhotoIds: cleanupPhotoIds // НОВОЕ: ID фотографий уборки
-    });
+    // Завершаем смену для текущего пользователя
+    completeShiftForUser(currentUser.username, shiftStartTime, endTime, shiftDuration, earnings, reason, dailyRevenue, cleanupPhotoIds);
 
-    saveUsers(users);
-    removeUserShiftData(currentUser.username);
+    // Проверяем, была ли эта смена совместной
+    const currentShiftData = getUserShiftData(currentUser.username);
+    if (currentShiftData && currentShiftData.partnerUsername) {
+        const partnerUsername = currentShiftData.partnerUsername;
+        const partnerShiftData = getUserShiftData(partnerUsername);
+
+        // Если у партнера тоже активна смена, завершаем ее
+        if (partnerShiftData && partnerShiftData.active && partnerShiftData.startTime === currentShiftData.startTime) {
+            completeShiftForUser(partnerUsername, shiftStartTime, endTime, shiftDuration, earnings, reason, dailyRevenue, cleanupPhotoIds);
+            showNotification(`Смена для ${users[partnerUsername].fullName || partnerUsername} также завершена!`);
+        }
+    }
+
+    removeUserShiftData(currentUser.username); // Удаляем данные о текущей активной смене
 
     const updatedUser = {
         ...currentUser,
@@ -585,6 +622,43 @@ function endShift(reason = 'Не указана', dailyRevenue = 0, cleanupPhoto
     showNotification(`Смена завершена! Заработано: ${earnings.toFixed(2)} руб. Выручка: ${dailyRevenue.toFixed(2)} руб. Причина: ${reason}`);
     shiftStartTime = null;
 }
+
+// НОВОЕ: Вспомогательная функция для завершения смены для конкретного пользователя
+function completeShiftForUser(username, startTime, endTime, duration, earnings, reason, dailyRevenue, cleanupPhotoIds) {
+    const users = getUsers();
+    const user = users[username];
+    const currentMonth = new Date(startTime).toISOString().slice(0, 7);
+
+    if (!user.stats) {
+        user.stats = { totalHours: 0, totalEarnings: 0, monthlyEarnings: {} };
+    }
+    if (!user.shifts) {
+        user.shifts = [];
+    }
+
+    user.stats.totalHours += duration;
+    user.stats.totalEarnings += earnings;
+
+    if (!user.stats.monthlyEarnings[currentMonth]) {
+        user.stats.monthlyEarnings[currentMonth] = 0;
+    }
+    user.stats.monthlyEarnings[currentMonth] += earnings;
+
+    user.shifts.push({
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+        duration: duration,
+        earnings: earnings,
+        date: startTime.toISOString(), // Используем startTime как дату смены
+        endReason: reason,
+        dailyRevenue: dailyRevenue,
+        cleanupPhotoIds: cleanupPhotoIds
+    });
+
+    saveUsers(users);
+    removeUserShiftData(username); // Удаляем активную смену для этого пользователя
+}
+
 
 // Запустить таймер смены
 function startShiftTimer() {
