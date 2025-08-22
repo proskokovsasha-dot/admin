@@ -23,6 +23,8 @@ function loadAdminDashboard() {
     loadUsersTable();
     updateHourlyRateDisplay();
     loadVisitRecordsTable(); // Загружаем записи о посещениях при старте
+    loadAdminShiftsTable(); // Загружаем записи о сменах при старте
+    loadCleanupPhotosTable(); // НОВОЕ: Загружаем фотографии уборки при старте
 }
 
 // Инициализация обработчиков для логина администратора
@@ -88,6 +90,10 @@ function showAdminTab(tabName) {
         loadUsersTable();
     } else if (tabName === 'visits') {
         loadVisitRecordsTable();
+    } else if (tabName === 'shifts') {
+        loadAdminShiftsTable();
+    } else if (tabName === 'cleanup-photos') { // НОВОЕ: Загрузка фото уборки
+        loadCleanupPhotosTable();
     } else if (tabName === 'settings') {
         updateHourlyRateDisplay();
     }
@@ -154,14 +160,17 @@ function deleteUser(usernameToDelete) {
         saveUsers(users);
         removeUserShiftData(usernameToDelete); // Удаляем данные о смене пользователя
         removeUserVisitRecords(usernameToDelete); // Удаляем данные о посещениях пользователя
-        removeRegisteredUsername(usernameToDelete); // НОВОЕ: Удаляем имя пользователя из списка автозаполнения
+        removeUserCleanupPhotos(usernameToDelete); // НОВОЕ: Удаляем фотографии уборки пользователя
+        removeRegisteredUsername(usernameToDelete); // Удаляем имя пользователя из списка автозаполнения
         showNotification(`Пользователь ${usernameToDelete} успешно удален.`);
         loadUsersTable(); // Перезагружаем таблицу пользователей
         loadVisitRecordsTable(); // Перезагружаем таблицу посещений
+        loadAdminShiftsTable(); // Перезагружаем таблицу смен
+        loadCleanupPhotosTable(); // НОВОЕ: Перезагружаем таблицу фото уборки
     }
 }
 
-// НОВАЯ ФУНКЦИЯ: Загрузка таблицы записей о посещениях
+// Загрузка таблицы записей о посещениях
 function loadVisitRecordsTable() {
     const visitRecords = getAllVisitRecords();
     const visitsTableBody = document.getElementById('visitsTableBody');
@@ -202,6 +211,158 @@ function loadVisitRecordsTable() {
         photoCell.appendChild(img);
     });
 }
+
+// Загрузка таблицы всех смен для администратора (обновлено для выручки)
+function loadAdminShiftsTable() {
+    const users = getUsers();
+    const adminShiftsTableBody = document.getElementById('adminShiftsTableBody');
+    adminShiftsTableBody.innerHTML = ''; // Очищаем таблицу
+
+    let allShifts = [];
+    for (const username in users) {
+        if (username === ADMIN_USERNAME) continue; // Исключаем админа
+        const user = users[username];
+        if (user.shifts && user.shifts.length > 0) {
+            user.shifts.forEach(shift => {
+                allShifts.push({
+                    username: username,
+                    fullName: user.fullName,
+                    ...shift
+                });
+            });
+        }
+    }
+
+    if (allShifts.length === 0) {
+        const row = adminShiftsTableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 8; // Увеличиваем colspan для новой колонки "Выручка"
+        cell.textContent = 'Нет записей о сменах.';
+        cell.style.textAlign = 'center';
+        cell.style.padding = '20px';
+        cell.style.color = 'var(--secondary-text-color)';
+        return;
+    }
+
+    // Сортируем смены по дате (новые сначала)
+    const sortedShifts = allShifts.sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+
+    sortedShifts.forEach((shift, index) => {
+        const row = adminShiftsTableBody.insertRow();
+
+        row.insertCell().textContent = shift.fullName || shift.username;
+        row.insertCell().textContent = formatDateTime(shift.startTime);
+        row.insertCell().textContent = formatDateTime(shift.endTime);
+        row.insertCell().textContent = formatTimeDuration(shift.duration);
+        row.insertCell().textContent = `${(shift.earnings || 0).toFixed(2)} руб.`;
+        row.insertCell().textContent = `${(shift.dailyRevenue || 0).toFixed(2)} руб.`; // НОВОЕ: Выручка
+        row.insertCell().textContent = shift.endReason || 'Не указана';
+
+        const actionsCell = row.insertCell();
+        actionsCell.className = 'action-buttons';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Удалить';
+        deleteBtn.className = 'delete-btn';
+        // Передаем username и startTime для уникальной идентификации смены
+        deleteBtn.addEventListener('click', () => deleteShift(shift.username, shift.startTime));
+        actionsCell.appendChild(deleteBtn);
+    });
+}
+
+// Удаление конкретной смены (обновлено для удаления фото уборки)
+function deleteShift(username, startTime) {
+    if (confirm(`Вы уверены, что хотите удалить смену пользователя ${username} от ${formatDateTime(startTime)}?`)) {
+        const users = getUsers();
+        const user = users[username];
+
+        if (user && user.shifts) {
+            const shiftIndexToDelete = user.shifts.findIndex(s => s.startTime === startTime);
+
+            if (shiftIndexToDelete !== -1) {
+                const deletedShift = user.shifts[shiftIndexToDelete];
+                user.shifts.splice(shiftIndexToDelete, 1); // Удаляем смену
+
+                // Удаляем связанные фотографии уборки
+                if (deletedShift.cleanupPhotoIds && deletedShift.cleanupPhotoIds.length > 0) {
+                    deletedShift.cleanupPhotoIds.forEach(photoId => {
+                        removeCleanupPhoto(photoId);
+                    });
+                }
+
+                // Пересчитываем статистику пользователя
+                user.stats.totalHours -= deletedShift.duration;
+                user.stats.totalEarnings -= deletedShift.earnings;
+
+                const shiftMonth = new Date(deletedShift.date).toISOString().slice(0, 7);
+                if (user.stats.monthlyEarnings[shiftMonth]) {
+                    user.stats.monthlyEarnings[shiftMonth] -= deletedShift.earnings;
+                    if (user.stats.monthlyEarnings[shiftMonth] < 0.01) {
+                        delete user.stats.monthlyEarnings[shiftMonth];
+                    }
+                }
+                
+                saveUsers(users);
+                showNotification(`Смена пользователя ${username} успешно удалена.`);
+                loadAdminShiftsTable(); // Перезагружаем таблицу смен
+                loadCleanupPhotosTable(); // НОВОЕ: Перезагружаем таблицу фото уборки
+                const currentUser = getCurrentUser();
+                if (currentUser && currentUser.username === username) {
+                    removeUserShiftData(username);
+                }
+            } else {
+                showNotification('Ошибка: Смена не найдена.', false);
+            }
+        } else {
+            showNotification('Ошибка: Пользователь или его смены не найдены.', false);
+        }
+    }
+}
+
+// НОВАЯ ФУНКЦИЯ: Загрузка таблицы фотографий уборки
+function loadCleanupPhotosTable() {
+    const cleanupPhotos = getAllCleanupPhotos();
+    const cleanupPhotosTableBody = document.getElementById('cleanupPhotosTableBody');
+    cleanupPhotosTableBody.innerHTML = ''; // Очищаем таблицу
+
+    if (cleanupPhotos.length === 0) {
+        const row = cleanupPhotosTableBody.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 3;
+        cell.textContent = 'Нет записей о фотографиях уборки.';
+        cell.style.textAlign = 'center';
+        cell.style.padding = '20px';
+        cell.style.color = 'var(--secondary-text-color)';
+        return;
+    }
+
+    // Сортируем записи по дате (новые сначала)
+    const sortedPhotos = [...cleanupPhotos].sort((a, b) => {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+
+    sortedPhotos.forEach(photoRecord => {
+        const row = cleanupPhotosTableBody.insertRow();
+
+        row.insertCell().textContent = photoRecord.fullName || photoRecord.username;
+        row.insertCell().textContent = formatDateTime(photoRecord.timestamp);
+
+        const photoCell = row.insertCell();
+        const img = document.createElement('img');
+        img.src = photoRecord.photoData;
+        img.alt = `Фото уборки ${photoRecord.fullName}`;
+        img.style.width = '80px';
+        img.style.height = '80px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '8px';
+        img.style.cursor = 'pointer';
+        img.onclick = () => openPhotoInNewTab(photoRecord.photoData);
+        photoCell.appendChild(img);
+    });
+}
+
 
 // Вспомогательная функция для открытия фото в новой вкладке
 function openPhotoInNewTab(photoData) {

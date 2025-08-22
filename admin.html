@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель - TimeCafe</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/auth.css"> <!-- Используем некоторые стили аутентификации для логина -->
-    <link rel="stylesheet" href="css/admin.css"> <!-- Новые стили для админ-панели -->
-    <!-- Rubik уже подключен в style.css, но можно оставить для явности, если хотите -->
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -69,9 +68,17 @@
                     <i class="fas fa-users"></i>
                     <span>Пользователи</span>
                 </a>
+                <a href="#" class="admin-nav-item" data-tab="shifts">
+                    <i class="fas fa-history"></i>
+                    <span>Смены</span>
+                </a>
                 <a href="#" class="admin-nav-item" data-tab="visits">
                     <i class="fas fa-walking"></i>
                     <span>Посещения</span>
+                </a>
+                <a href="#" class="admin-nav-item" data-tab="cleanup-photos"> <!-- НОВАЯ ВКЛАДКА -->
+                    <i class="fas fa-broom"></i>
+                    <span>Фото уборки</span>
                 </a>
                 <a href="#" class="admin-nav-item" data-tab="settings">
                     <i class="fas fa-sliders-h"></i>
@@ -93,7 +100,7 @@
             <div class="admin-tab-content">
                 <!-- Вкладка Пользователи -->
                 <div class="admin-tab-pane active" id="users-tab">
-                    <div class="tab-header"> <!-- Добавил класс tab-header -->
+                    <div class="tab-header">
                         <h2>Список пользователей</h2>
                     </div>
                     <div class="users-list-container">
@@ -114,7 +121,33 @@
                     </div>
                 </div>
 
-                <!-- НОВАЯ Вкладка Посещения -->
+                <!-- НОВАЯ Вкладка Смены -->
+                <div class="admin-tab-pane" id="shifts-tab">
+                    <div class="tab-header">
+                        <h2>Все записи о сменах</h2>
+                    </div>
+                    <div class="shifts-list-container">
+                        <table class="shifts-table">
+                            <thead>
+                                <tr>
+                                    <th>Пользователь</th>
+                                    <th>Начало смены</th>
+                                    <th>Конец смены</th>
+                                    <th>Длительность</th>
+                                    <th>Заработок</th>
+                                    <th>Выручка</th> <!-- НОВАЯ КОЛОНКА -->
+                                    <th>Причина завершения</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminShiftsTableBody">
+                                <!-- Смены будут загружены через JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Вкладка Посещения -->
                 <div class="admin-tab-pane" id="visits-tab">
                     <div class="tab-header">
                         <h2>Записи о посещениях вне смены</h2>
@@ -135,9 +168,30 @@
                     </div>
                 </div>
 
+                <!-- НОВАЯ Вкладка Фото уборки -->
+                <div class="admin-tab-pane" id="cleanup-photos-tab">
+                    <div class="tab-header">
+                        <h2>Фотографии уборки после смен</h2>
+                    </div>
+                    <div class="cleanup-photos-container users-list-container"> <!-- Используем стили users-list-container -->
+                        <table class="cleanup-photos-table users-table"> <!-- Используем стили users-table -->
+                            <thead>
+                                <tr>
+                                    <th>Пользователь</th>
+                                    <th>Дата и время</th>
+                                    <th>Фото</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cleanupPhotosTableBody">
+                                <!-- Фото уборки будут загружены через JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Вкладка Настройки -->
                 <div class="admin-tab-pane" id="settings-tab">
-                    <div class="tab-header"> <!-- Добавил класс tab-header -->
+                    <div class="tab-header">
                         <h2>Настройки системы</h2>
                     </div>
                     <div class="settings-card">

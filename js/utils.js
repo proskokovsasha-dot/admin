@@ -125,13 +125,60 @@ function removeRegisteredUsername(username) {
 }
 // КОНЕЦ НОВЫХ ФУНКЦИЙ ДЛЯ СПИСКА ПОЛЬЗОВАТЕЛЕЙ
 
-// Форматирование времени
+// НОВЫЕ ФУНКЦИИ ДЛЯ ФОТОГРАФИЙ УБОРКИ
+// Получить все записи о фотографиях уборки
+function getAllCleanupPhotos() {
+    const photos = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('cleanup_photo_')) {
+            photos.push(JSON.parse(localStorage.getItem(key)));
+        }
+    }
+    return photos;
+}
+
+// Сохранить фотографию уборки
+function saveCleanupPhoto(photoId, data) {
+    localStorage.setItem(`cleanup_photo_${photoId}`, JSON.stringify(data));
+}
+
+// Удалить фотографию уборки по ID
+function removeCleanupPhoto(photoId) {
+    localStorage.removeItem(`cleanup_photo_${photoId}`);
+}
+
+// Удалить все фотографии уборки для конкретного пользователя
+function removeUserCleanupPhotos(username) {
+    const photosToDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('cleanup_photo_')) {
+            const photoData = JSON.parse(localStorage.getItem(key));
+            if (photoData.username === username) {
+                photosToDelete.push(key);
+            }
+        }
+    }
+    photosToDelete.forEach(key => localStorage.removeItem(key));
+}
+// КОНЕЦ НОВЫХ ФУНКЦИЙ ДЛЯ ФОТОГРАФИЙ УБОРКИ
+
+
+// Форматирование времени (для таймера)
 function formatTime(ms) {
     const hours = Math.floor(ms / 1000 / 60 / 60);
     const minutes = Math.floor((ms / 1000 / 60) % 60);
     const seconds = Math.floor((ms / 1000) % 60);
 
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Форматирование длительности смены (для отображения в таблицах)
+function formatTimeDuration(hoursFloat) {
+    const hours = Math.floor(hoursFloat);
+    const minutes = Math.floor(Math.round((hoursFloat - hours) * 60));
+    return `${hours}ч ${minutes}м`;
 }
 
 // Форматирование даты (исправлено)
@@ -200,7 +247,7 @@ function checkAuth() {
     return currentUser;
 }
 
-// Генерация случайного ID
+// Генерация случайного ID (не используется напрямую в текущем коде, но полезно)
 function generateId() {
     return Math.random().toString(36).substr(2, 9);
 }

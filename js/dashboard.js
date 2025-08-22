@@ -3,7 +3,8 @@
 let shiftInterval;
 let shiftStartTime = null;
 let currentStream = null;
-let photoPurpose = 'shift'; // 'shift' или 'visit'
+let photoPurpose = 'shift'; // 'shift', 'visit', или 'cleanup'
+let cleanupPhotos = []; // Массив для хранения фотографий уборки перед завершением смены
 
 // Загрузка личного кабинета
 function loadDashboard() {
@@ -31,6 +32,21 @@ function loadDashboard() {
 
     // Добавляем обработчики событий
     initEventHandlers();
+
+    // НОВОЕ: Обработчик для события перед выгрузкой страницы (закрытие/перезагрузка)
+    window.addEventListener('beforeunload', handleBeforeUnload);
+}
+
+// НОВОЕ: Обработчик перед выгрузкой страницы
+function handleBeforeUnload() {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        const shiftData = getUserShiftData(currentUser.username);
+        if (shiftData && shiftData.active) {
+            // Если смена активна, автоматически завершаем ее
+            endShift('Автоматическое завершение при выходе из системы', 0, []); // Передаем 0 выручки и пустой массив фото
+        }
+    }
 }
 
 // Обновление информации о пользователе
@@ -126,6 +142,11 @@ function openModal(modalName) {
         } else if (modalName === 'profile') {
             const currentUser = getCurrentUser();
             updateUserInfo(currentUser); // Обновляем данные профиля перед открытием
+        } else if (modalName === 'cleanupPhotos') { // НОВОЕ: Для модального окна уборки
+            cleanupPhotos = []; // Сбрасываем массив фото при открытии
+            updateCleanupPhotoPreview();
+            document.getElementById('dailyRevenue').value = ''; // Очищаем поле выручки
+            document.getElementById('shiftEndReason').value = ''; // Очищаем поле причины
         }
     }
 }
@@ -144,10 +165,33 @@ function initEventHandlers() {
         startShiftBtn.addEventListener('click', () => startShiftWithPhoto('shift'));
     }
 
-    // Кнопка завершения смены
+    // Кнопка завершения смены (открывает модальное окно с причиной)
     const endShiftBtn = document.getElementById('endShiftBtn');
     if (endShiftBtn) {
-        endShiftBtn.addEventListener('click', endShift);
+        endShiftBtn.addEventListener('click', () => openModal('cleanupPhotos')); // НОВОЕ: Открываем модальное окно для фото уборки
+    }
+
+    // НОВОЕ: Кнопка подтверждения завершения смены в модальном окне cleanupPhotosModal
+    const confirmCleanupAndEndShiftBtn = document.getElementById('confirmCleanupAndEndShiftBtn');
+    if (confirmCleanupAndEndShiftBtn) {
+        confirmCleanupAndEndShiftBtn.addEventListener('click', () => {
+            const reason = document.getElementById('shiftEndReason').value;
+            const dailyRevenue = parseFloat(document.getElementById('dailyRevenue').value);
+
+            if (cleanupPhotos.length < 3) {
+                showNotification('Пожалуйста, загрузите минимум 3 фотографии уборки.', false);
+                return;
+            }
+            if (isNaN(dailyRevenue) || dailyRevenue < 0) {
+                showNotification('Пожалуйста, введите корректную выручку (число больше или равно 0).', false);
+                return;
+            }
+
+            endShift(reason, dailyRevenue, cleanupPhotos); // Передаем выручку и фото
+            document.getElementById('cleanupPhotosModal').classList.remove('active');
+            cleanupPhotos = []; // Очищаем массив после завершения смены
+            updateCleanupPhotoPreview();
+        });
     }
 
     // Кнопка выхода
@@ -217,6 +261,30 @@ function initEventHandlers() {
     if (shiftsFilter) {
         shiftsFilter.addEventListener('change', loadShiftsHistory);
     }
+
+    // НОВОЕ: Обработчик для загрузки фотографий уборки
+    const cleanupPhotoInput = document.getElementById('cleanupPhotoInput');
+    if (cleanupPhotoInput) {
+        cleanupPhotoInput.addEventListener('change', handleCleanupPhotoUpload);
+    }
+    // НОВОЕ: Обработчик для области перетаскивания файлов
+    const fileUploadArea = document.querySelector('.file-upload-area');
+    if (fileUploadArea) {
+        fileUploadArea.addEventListener('click', () => cleanupPhotoInput.click());
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--accent-color-1)';
+        });
+        fileUploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--border-color)';
+        });
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--border-color)';
+            handleCleanupPhotoUpload({ target: { files: e.dataTransfer.files } });
+        });
+    }
 }
 
 // Обработка загрузки аватара
@@ -240,6 +308,70 @@ function handleAvatarUpload(event) {
         reader.readAsDataURL(file);
     }
 }
+
+// НОВОЕ: Обработка загрузки фотографий уборки
+function handleCleanupPhotoUpload(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                cleanupPhotos.push(e.target.result);
+                updateCleanupPhotoPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+
+// НОВОЕ: Обновление превью фотографий уборки
+function updateCleanupPhotoPreview() {
+    const previewContainer = document.getElementById('cleanupPhotoPreview');
+    previewContainer.innerHTML = '';
+    cleanupPhotos.forEach((photoData, index) => {
+        const imgWrapper = document.createElement('div');
+        imgWrapper.style.position = 'relative';
+        imgWrapper.style.width = '80px';
+        imgWrapper.style.height = '80px';
+        imgWrapper.style.borderRadius = '8px';
+        imgWrapper.style.overflow = 'hidden';
+        imgWrapper.style.border = '1px solid var(--border-color)';
+
+        const img = document.createElement('img');
+        img.src = photoData;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        imgWrapper.appendChild(img);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+        deleteBtn.style.position = 'absolute';
+        deleteBtn.style.top = '5px';
+        deleteBtn.style.right = '5px';
+        deleteBtn.style.background = 'rgba(255, 71, 87, 0.8)';
+        deleteBtn.style.color = 'white';
+        deleteBtn.style.border = 'none';
+        deleteBtn.style.borderRadius = '50%';
+        deleteBtn.style.width = '20px';
+        deleteBtn.style.height = '20px';
+        deleteBtn.style.display = 'flex';
+        deleteBtn.style.alignItems = 'center';
+        deleteBtn.style.justifyContent = 'center';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.fontSize = '12px';
+        deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            cleanupPhotos.splice(index, 1);
+            updateCleanupPhotoPreview();
+        };
+        imgWrapper.appendChild(deleteBtn);
+
+        previewContainer.appendChild(imgWrapper);
+    });
+    document.getElementById('cleanupPhotoCount').textContent = `Загружено: ${cleanupPhotos.length} фото (минимум 3)`;
+}
+
 
 // Начать смену с фото подтверждением или отметить посещение
 function startShiftWithPhoto(purpose) {
@@ -377,8 +509,8 @@ function confirmPhotoAction() {
     document.getElementById('photoModal').classList.remove('active');
 }
 
-// Завершить смену
-function endShift() {
+// Завершить смену (обновлено для выручки и фото уборки)
+function endShift(reason = 'Не указана', dailyRevenue = 0, cleanupPhotosData = []) {
     const currentUser = getCurrentUser();
     if (!currentUser) return;
 
@@ -410,12 +542,27 @@ function endShift() {
 
     users[currentUser.username].stats.monthlyEarnings[currentMonth] += earnings;
 
+    // Сохраняем фотографии уборки отдельно и получаем их ID
+    const cleanupPhotoIds = cleanupPhotosData.map(photoData => {
+        const photoId = generateId(); // Генерируем уникальный ID для фото
+        saveCleanupPhoto(photoId, {
+            photoData: photoData,
+            timestamp: new Date().toISOString(),
+            username: currentUser.username,
+            fullName: currentUser.fullName || currentUser.username
+        });
+        return photoId;
+    });
+
     users[currentUser.username].shifts.push({
         startTime: shiftStartTime.toISOString(),
         endTime: endTime.toISOString(),
         duration: shiftDuration,
         earnings: earnings,
-        date: new Date().toISOString() // Сохраняем полную дату для сортировки
+        date: new Date().toISOString(), // Сохраняем полную дату для сортировки
+        endReason: reason, // Причина завершения
+        dailyRevenue: dailyRevenue, // НОВОЕ: Выручка за смену
+        cleanupPhotoIds: cleanupPhotoIds // НОВОЕ: ID фотографий уборки
     });
 
     saveUsers(users);
@@ -435,7 +582,7 @@ function endShift() {
     updateUserStats(updatedUser);
     loadShiftsHistory(); // Обновляем историю смен после завершения
 
-    showNotification(`Смена завершена! Заработано: ${earnings.toFixed(2)} руб.`);
+    showNotification(`Смена завершена! Заработано: ${earnings.toFixed(2)} руб. Выручка: ${dailyRevenue.toFixed(2)} руб. Причина: ${reason}`);
     shiftStartTime = null;
 }
 
@@ -567,12 +714,14 @@ function loadShiftsHistory() {
         });
 
         const hours = Math.floor(shift.duration);
-        const minutes = Math.floor((shift.duration - hours) * 60);
+        const minutes = Math.floor(Math.round((shift.duration - hours) * 60)); // Округляем минуты
 
         shiftItem.innerHTML = `
             <div class="shift-info">
                 <h4>Смена от ${formattedDate}</h4>
                 <p>${new Date(shift.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(shift.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                ${shift.endReason ? `<p style="font-size: 12px; color: var(--secondary-text-color);">Причина: ${shift.endReason}</p>` : ''}
+                ${shift.dailyRevenue !== undefined ? `<p style="font-size: 12px; color: var(--secondary-text-color);">Выручка: ${shift.dailyRevenue.toFixed(2)} руб.</p>` : ''}
             </div>
             <div class="shift-details">
                 <span class="shift-duration">${hours}ч ${minutes}м</span>
@@ -591,8 +740,10 @@ function logout() {
     if (currentUser) {
         const shiftData = getUserShiftData(currentUser.username);
         if (shiftData && shiftData.active) {
-            if (!confirm('У вас активная смена. Вы уверены, что хотите выйти?')) {
-                return;
+            if (confirm('У вас активная смена. Вы уверены, что хотите выйти? Смена будет автоматически завершена.')) {
+                endShift('Автоматическое завершение при выходе из системы', 0, []); // Автоматически завершаем смену
+            } else {
+                return; // Отменяем выход, если пользователь не подтвердил
             }
         }
     }
@@ -600,6 +751,7 @@ function logout() {
     removeCurrentUser();
     clearInterval(shiftInterval);
     stopCamera();
+    window.removeEventListener('beforeunload', handleBeforeUnload); // Удаляем обработчик
     window.location.href = 'index.html';
 }
 

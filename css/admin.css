@@ -135,7 +135,8 @@
 }
 
 .users-list-container,
-.visits-list-container { /* Добавил .visits-list-container */
+.visits-list-container,
+.shifts-list-container { /* Добавил .visits-list-container и .shifts-list-container */
     background: var(--secondary-bg);
     border-radius: 15px;
     padding: 30px; /* Увеличиваем паддинг */
@@ -144,7 +145,8 @@
 }
 
 .users-table,
-.visits-table { /* Добавил .visits-table */
+.visits-table,
+.shifts-table { /* Добавил .visits-table и .shifts-table */
     width: 100%;
     border-collapse: separate; /* Для border-radius на ячейках */
     border-spacing: 0 8px; /* Отступ между строками */
@@ -154,14 +156,17 @@
 .users-table th,
 .users-table td,
 .visits-table th,
-.visits-table td { /* Добавил .visits-table */
+.visits-table td,
+.shifts-table th,
+.shifts-table td { /* Добавил .visits-table и .shifts-table */
     padding: 15px 20px; /* Увеличиваем паддинг */
     text-align: left;
     border: none; /* Убираем стандартные границы */
 }
 
 .users-table th,
-.visits-table th { /* Добавил .visits-table */
+.visits-table th,
+.shifts-table th { /* Добавил .visits-table и .shifts-table */
     background: var(--primary-bg); /* Светлый фон для заголовков */
     font-weight: 600;
     color: var(--secondary-text-color);
@@ -171,18 +176,21 @@
 }
 
 .users-table th:first-child,
-.visits-table th:first-child { /* Добавил .visits-table */
+.visits-table th:first-child,
+.shifts-table th:first-child { /* Добавил .visits-table и .shifts-table */
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 }
 .users-table th:last-child,
-.visits-table th:last-child { /* Добавил .visits-table */
+.visits-table th:last-child,
+.shifts-table th:last-child { /* Добавил .visits-table и .shifts-table */
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
 .users-table td,
-.visits-table td { /* Добавил .visits-table */
+.visits-table td,
+.shifts-table td { /* Добавил .visits-table и .shifts-table */
     color: var(--text-color);
     font-size: 16px;
     background: var(--primary-bg); /* Светлый фон для строк */
@@ -191,17 +199,20 @@
 }
 
 .users-table tr:hover td,
-.visits-table tr:hover td { /* Добавил .visits-table */
+.visits-table tr:hover td,
+.shifts-table tr:hover td { /* Добавил .visits-table и .shifts-table */
     background: var(--tertiary-bg); /* Чуть темнее при наведении */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.users-table .action-buttons {
+.users-table .action-buttons,
+.shifts-table .action-buttons { /* Добавил .shifts-table */
     display: flex;
     gap: 10px; /* Чуть больше отступ */
 }
 
-.users-table .action-buttons button {
+.users-table .action-buttons button,
+.shifts-table .action-buttons button { /* Добавил .shifts-table */
     padding: 10px 15px; /* Увеличиваем паддинг */
     border-radius: 8px;
     font-size: 14px;
@@ -210,14 +221,16 @@
     font-weight: 500;
 }
 
-.users-table .action-buttons .delete-btn {
+.users-table .action-buttons .delete-btn,
+.shifts-table .action-buttons .delete-btn { /* Добавил .shifts-table */
     background: var(--error-color);
     color: white;
     border: none;
     box-shadow: 0 2px 8px rgba(255, 71, 87, 0.2);
 }
 
-.users-table .action-buttons .delete-btn:hover {
+.users-table .action-buttons .delete-btn:hover,
+.shifts-table .action-buttons .delete-btn:hover { /* Добавил .shifts-table */
     background: #e03c4c;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
@@ -306,22 +319,27 @@
     }
 
     .users-list-container,
-    .visits-list-container { /* Добавил .visits-list-container */
+    .visits-list-container,
+    .shifts-list-container { /* Добавил .visits-list-container и .shifts-list-container */
         padding: 20px;
     }
     .users-table,
-    .visits-table { /* Добавил .visits-table */
+    .visits-table,
+    .shifts-table { /* Добавил .visits-table и .shifts-table */
         border-spacing: 0 5px;
     }
     .users-table th,
     .users-table td,
     .visits-table th,
-    .visits-table td { /* Добавил .visits-table */
+    .visits-table td,
+    .shifts-table th,
+    .shifts-table td { /* Добавил .visits-table и .shifts-table */
         font-size: 13px;
         padding: 12px 15px;
     }
 
-    .users-table .action-buttons button {
+    .users-table .action-buttons button,
+    .shifts-table .action-buttons button { /* Добавил .shifts-table */
         padding: 8px 12px;
         font-size: 12px;
     }
@@ -357,17 +375,21 @@
         font-size: 20px;
     }
     .users-list-container,
-    .visits-list-container { /* Добавил .visits-list-container */
+    .visits-list-container,
+    .shifts-list-container { /* Добавил .visits-list-container и .shifts-list-container */
         padding: 15px;
     }
     .users-table th,
     .users-table td,
     .visits-table th,
-    .visits-table td { /* Добавил .visits-table */
+    .visits-table td,
+    .shifts-table th,
+    .shifts-table td { /* Добавил .visits-table и .shifts-table */
         font-size: 12px;
         padding: 10px;
     }
-    .users-table .action-buttons button {
+    .users-table .action-buttons button,
+    .shifts-table .action-buttons button { /* Добавил .shifts-table */
         padding: 6px 10px;
         font-size: 11px;
     }

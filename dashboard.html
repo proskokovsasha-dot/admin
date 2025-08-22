@@ -6,7 +6,6 @@
     <title>Личный кабинет - TimeCafe</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
-    <!-- Rubik уже подключен в style.css, но можно оставить для явности, если хотите -->
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -16,7 +15,7 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="user-avatar">
-                    <img src="https://ui-avatars.com/api/?name=User&background=6A11CB&color=fff" alt="Avatar" id="userAvatar"> <!-- Обновил цвет фона для дефолтного аватара -->
+                    <img src="https://ui-avatars.com/api/?name=User&background=6A11CB&color=fff" alt="Avatar" id="userAvatar">
                     <span class="online-status"></span>
                 </div>
                 <h2 id="userName">Имя пользователя</h2>
@@ -181,6 +180,41 @@
                         Подтвердить
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- НОВОЕ: Модальное окно для загрузки фотографий уборки и ввода выручки -->
+    <div class="modal" id="cleanupPhotosModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Завершение смены: Фото уборки и выручка</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--secondary-text-color); margin-bottom: 15px;">Пожалуйста, загрузите фотографии убранного рабочего места (минимум 3 фото) и укажите выручку за смену.</p>
+                
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <i class="fas fa-ruble-sign"></i>
+                    <input type="number" id="dailyRevenue" placeholder="Выручка за смену (руб.)" min="0" step="0.01">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <i class="fas fa-comment-alt"></i>
+                    <input type="text" id="shiftEndReason" placeholder="Причина завершения смены (необязательно)">
+                </div>
+
+                <div class="file-upload-area" style="border: 2px dashed var(--border-color); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; margin-bottom: 20px;">
+                    <input type="file" id="cleanupPhotoInput" accept="image/*" multiple style="display: none;">
+                    <p style="color: var(--secondary-text-color);"><i class="fas fa-upload" style="margin-right: 10px;"></i>Нажмите или перетащите файлы для загрузки фото уборки</p>
+                    <div id="cleanupPhotoPreview" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;"></div>
+                </div>
+                <p id="cleanupPhotoCount" style="text-align: center; color: var(--secondary-text-color); margin-bottom: 15px;">Загружено: 0 фото (минимум 3)</p>
+
+                <button class="btn-primary" id="confirmCleanupAndEndShiftBtn">
+                    <i class="fas fa-check"></i>
+                    Завершить смену
+                </button>
             </div>
         </div>
     </div>
