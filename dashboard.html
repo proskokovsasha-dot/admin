@@ -214,12 +214,12 @@
                     <input type="text" id="shiftEndReason" placeholder="Причина завершения смены (необязательно)">
                 </div>
 
-                <div class="file-upload-area" style="border: 2px dashed var(--border-color); padding: 20px; border-radius: 10px; text-align: center; cursor: pointer; margin-bottom: 20px;">
+                <div class="file-upload-area">
                     <input type="file" id="cleanupPhotoInput" accept="image/*" multiple style="display: none;">
-                    <p style="color: var(--secondary-text-color);"><i class="fas fa-upload" style="margin-right: 10px;"></i>Нажмите или перетащите файлы для загрузки фото уборки</p>
-                    <div id="cleanupPhotoPreview" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;"></div>
+                    <p><i class="fas fa-upload"></i>Нажмите или перетащите файлы для загрузки фото уборки</p>
+                    <div id="cleanupPhotoPreview"></div>
                 </div>
-                <p id="cleanupPhotoCount" style="text-align: center; color: var(--secondary-text-color); margin-bottom: 15px;">Загружено: 0 фото (минимум 3)</p>
+                <p id="cleanupPhotoCount">Загружено: 0 фото (минимум 3)</p>
 
                 <button class="btn-primary" id="confirmCleanupAndEndShiftBtn">
                     <i class="fas fa-check"></i>

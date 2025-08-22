@@ -554,6 +554,84 @@
     justify-content: center;
 }
 
+/* Стили для модального окна завершения смены (cleanupPhotosModal) */
+.file-upload-area {
+    border: 2px dashed var(--border-color);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+.file-upload-area:hover {
+    border-color: var(--accent-color-1);
+}
+
+.file-upload-area p {
+    color: var(--secondary-text-color);
+    margin-bottom: 10px;
+}
+
+.file-upload-area i {
+    margin-right: 10px;
+    color: var(--accent-color-1);
+}
+
+#cleanupPhotoPreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+#cleanupPhotoPreview > div {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#cleanupPhotoPreview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#cleanupPhotoPreview button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 71, 87, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#cleanupPhotoPreview button:hover {
+    background: var(--error-color);
+}
+
+#cleanupPhotoCount {
+    text-align: center;
+    color: var(--secondary-text-color);
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
 /* Адаптивность */
 @media (max-width: 1024px) {
     .sidebar {
@@ -689,6 +767,27 @@
     .shift-details {
         text-align: left;
     }
+
+    /* Адаптация модального окна завершения смены для мобильных */
+    .modal-content {
+        max-width: 95%; /* Увеличиваем ширину на маленьких экранах */
+    }
+    .file-upload-area {
+        padding: 15px;
+    }
+    .file-upload-area p {
+        font-size: 14px;
+    }
+    #cleanupPhotoPreview {
+        justify-content: flex-start; /* Выравнивание влево для лучшего использования пространства */
+    }
+    #cleanupPhotoPreview > div {
+        width: 70px;
+        height: 70px;
+    }
+    #cleanupPhotoCount {
+        font-size: 13px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -776,3 +875,4 @@
         height: 250px;
     }
 }
+
