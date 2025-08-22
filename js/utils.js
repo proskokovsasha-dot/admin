@@ -102,6 +102,29 @@ function removeUserVisitRecords(username) {
 }
 // КОНЕЦ НОВЫХ ФУНКЦИЙ
 
+// НОВЫЕ ФУНКЦИИ ДЛЯ СПИСКА ПОЛЬЗОВАТЕЛЕЙ В АВТОЗАПОЛНЕНИИ
+// Получить список всех зарегистрированных имен пользователей
+function getRegisteredUsernames() {
+    return JSON.parse(localStorage.getItem('registeredUsernames') || '[]');
+}
+
+// Добавить имя пользователя в список зарегистрированных
+function addRegisteredUsername(username) {
+    let usernames = getRegisteredUsernames();
+    if (!usernames.includes(username) && username !== ADMIN_USERNAME) { // Исключаем админа из списка
+        usernames.push(username);
+        localStorage.setItem('registeredUsernames', JSON.stringify(usernames));
+    }
+}
+
+// Удалить имя пользователя из списка зарегистрированных (при удалении пользователя)
+function removeRegisteredUsername(username) {
+    let usernames = getRegisteredUsernames();
+    usernames = usernames.filter(name => name !== username);
+    localStorage.setItem('registeredUsernames', JSON.stringify(usernames));
+}
+// КОНЕЦ НОВЫХ ФУНКЦИЙ ДЛЯ СПИСКА ПОЛЬЗОВАТЕЛЕЙ
+
 // Форматирование времени
 function formatTime(ms) {
     const hours = Math.floor(ms / 1000 / 60 / 60);

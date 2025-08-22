@@ -53,6 +53,7 @@ function register() {
     };
     
     saveUsers(users);
+    addRegisteredUsername(username); // НОВОЕ: Добавляем имя пользователя в список для автозаполнения
     showNotification('Аккаунт успешно создан!');
     
     // Автоматически входим после регистрации
@@ -135,6 +136,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Анимация появления элементов
     animateAuthElements();
+
+    // НОВОЕ: Загружаем список пользователей для автозаполнения на странице логина
+    if (window.location.pathname.includes('index.html')) {
+        populateUsernameDatalist();
+    }
 });
 
 // Анимация элементов на страницах аутентификации
@@ -151,4 +157,18 @@ function animateAuthElements() {
         button.style.animationDelay = `${0.1 * (inputs.length + index)}s`;
         button.classList.add('animate__animated', 'animate__fadeInUp');
     });
+}
+
+// НОВАЯ ФУНКЦИЯ: Заполнение datalist именами пользователей
+function populateUsernameDatalist() {
+    const datalist = document.getElementById('registeredUsernames');
+    if (datalist) {
+        datalist.innerHTML = ''; // Очищаем существующие опции
+        const usernames = getRegisteredUsernames();
+        usernames.forEach(username => {
+            const option = document.createElement('option');
+            option.value = username;
+            datalist.appendChild(option);
+        });
+    }
 }

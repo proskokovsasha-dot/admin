@@ -153,7 +153,8 @@ function deleteUser(usernameToDelete) {
         delete users[usernameToDelete];
         saveUsers(users);
         removeUserShiftData(usernameToDelete); // Удаляем данные о смене пользователя
-        removeUserVisitRecords(usernameToDelete); // НОВОЕ: Удаляем данные о посещениях пользователя
+        removeUserVisitRecords(usernameToDelete); // Удаляем данные о посещениях пользователя
+        removeRegisteredUsername(usernameToDelete); // НОВОЕ: Удаляем имя пользователя из списка автозаполнения
         showNotification(`Пользователь ${usernameToDelete} успешно удален.`);
         loadUsersTable(); // Перезагружаем таблицу пользователей
         loadVisitRecordsTable(); // Перезагружаем таблицу посещений
